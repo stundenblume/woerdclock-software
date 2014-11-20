@@ -1,6 +1,11 @@
 /*
-Serial Communication Modul for Wördclock v0.2 by Marcel Müller
+Serial Communication Modul for Wördclock v0.3 by Marcel Müller
 based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz
+
+ToDo:
+-before we implement this to woerdclock.ino
+-- we have to clearify the usage of all the serial ports, any idea?
+-- and how we can use more than one serial port
 
 Jobs:
 check if serial communication is available
@@ -9,48 +14,58 @@ check if serial communication is available
 - via WiFi, then use WiFi
 if no communication is available, do something else in the loop
 
-In version 0.1 and 0.2, usb serial only
+In version 0.1, 0.2, 0,3 usb serial only
+/* 
+  version 0.1
+  Der Sketch verwendet 8.486 Bytes (29%) des Programmspeicherplatzes. Das Maximum sind 28.672 Bytes.
+  Globale Variablen verwenden 405 Bytes (15%) des dynamischen Speichers, 2.155 Bytes für lokale Variablen verbleiben. Das Maximum sind 2.560 Bytes.
+*/
 
+/* 
+  version 0.2
+  Der Sketch verwendet 8.150 Bytes (28%) des Programmspeicherplatzes. Das Maximum sind 28.672 Bytes.
+  Globale Variablen verwenden 278 Bytes (10%) des dynamischen Speichers, 2.282 Bytes für lokale Variablen verbleiben. Das Maximum sind 2.560 Bytes.
+*/
+
+/* 
+  version 0.3
+  serial_interprete() as standalone function for serial communication
+*/
+
+/*
 Tested with Arduino IDE 1.5.7
  
 Implemented commands are
-show = show status
-help = help text
-
-slb = set_led_brightness (store in SRAM)
-glb = get_led_brightness (get from SRAM)
-
-slbp = set_led_brightness_permanent (store in EEPROM)
-glbp = get_led_brightness_permanent (get from EEPROM)
-
-slc = set_led_color (store in SRAM)
-glc = get_led_color (get from SRAM)
-
-slcp = set_led_color_permanent (store in EEPROM)
-glcp = get_led_color_permanent (get from EEPROM)
+  show = show status
+  help = help text
+  
+  slb = set_led_brightness (store in SRAM)
+  glb = get_led_brightness (get from SRAM)
+  
+  slbp = set_led_brightness_permanent (store in EEPROM)
+  glbp = get_led_brightness_permanent (get from EEPROM)
+  
+  slc = set_led_color (store in SRAM)
+  glc = get_led_color (get from SRAM)
+  
+  slcp = set_led_color_permanent (store in EEPROM)
+  glcp = get_led_color_permanent (get from EEPROM)
 */
+
 
 #include <avr/pgmspace.h>     // to use progmem to store arrays in Flash Memory instead of SRAM
 //#include <EEPROMVar.h>        // to use EEPROMex - version 0.1 only
 //#include <EEPROMex.h>         // to store different data types to EEPROM -version 0.1 only
 #include <EEPROM.h>
 
-/* version 0.1
-Der Sketch verwendet 8.486 Bytes (29%) des Programmspeicherplatzes. Das Maximum sind 28.672 Bytes.
-Globale Variablen verwenden 405 Bytes (15%) des dynamischen Speichers, 2.155 Bytes für lokale Variablen verbleiben. Das Maximum sind 2.560 Bytes.
-*/
 
-/* version 0.2
-Der Sketch verwendet 8.150 Bytes (28%) des Programmspeicherplatzes. Das Maximum sind 28.672 Bytes.
-Globale Variablen verwenden 278 Bytes (10%) des dynamischen Speichers, 2.282 Bytes für lokale Variablen verbleiben. Das Maximum sind 2.560 Bytes.
+/* Start command definitions for serial communication*/
+/*
+  paraCount defines the maximum number of command and parameters
+  paraLength defines the maximum length for commands and parameters (paraLength = max command/parameter length +1)
+  cmdCount defines the number of entities
+  cmdStrCon defines the commands in lower case!!
 */
-
-/* Start command definitions for serial communication
- paraCount defines the maximum number of command and parameters
- paraLength defines the maximum length for commands and parameters (paraLength = max command/parameter length +1)
- cmdCount defines the number of entities
- cmdStrCon defines the commands in lower case!!
- */
 
 long BAUDRATE = 9600;                                // default Baudrate for serial communication
 const byte  paraCount = 4;                            // max quantity of parameter (incl. command) per line    slc = r,g,b
@@ -85,6 +100,8 @@ int        cmdStrIn=0;                               //index for the cmdStr
 char       cmd[paraCount][paraLength];               //arry with command and parameters
 /* End command definitons for serial communication */
 
+
+
 boolean showvalues;
 byte LEDbright = EEPROM.read(0);
 byte LEDcolorR = EEPROM.read(1);
@@ -92,9 +109,11 @@ byte LEDcolorG = EEPROM.read(2);
 byte LEDcolorB = EEPROM.read(3);
 unsigned long  serialTime;
 
+
+
 void setup()
 {
-
+/* You need this in your setup */
   BAUDRATE = 9600;
 
   int i;
@@ -102,12 +121,33 @@ void setup()
   Serial.begin(BAUDRATE);                        // initialize serial port to send and receive at xxxxx baud
   for(i=0; i++; i<paraCount)
     cmd[i][0]='\0';
-
+/* You need this in your setup */
 }
+
+
 
 void loop()
 {
 
+  serial_interprete();
+
+  /* send data for maintenance, if show=1
+  if(showvalues)
+  {
+    if(millis()>serialTime)
+    {
+      //Print status
+      serialTime+=3000;
+    }
+  }
+*/
+
+}
+
+
+
+void serial_interprete(void)
+{
   /* Serial communication start */
   int i,j,k;
 
@@ -175,6 +215,10 @@ void loop()
       case  4: 
 //slbp = set_led_brightness_permanent (store in EEPROM)
 	EEPROM.write(0, LEDbright);
+        /*        
+        Serial.print("Now, LED brightness is: ");
+        Serial.println(EEPROM.read(0));
+        */
         break;
 
       case  5: 
@@ -205,13 +249,14 @@ void loop()
         EEPROM.write(1, LEDcolorR);
         EEPROM.write(2, LEDcolorG);
         EEPROM.write(3, LEDcolorB);
-/*        Serial.print("Now, LED color is: ");
+        /*
+        Serial.print("Now, LED color is: ");
         Serial.print(EEPROM.read(1));
         Serial.print(",");
         Serial.print(EEPROM.read(2));
         Serial.print(",");
         Serial.println(EEPROM.read(3));
-*/
+        */
         break;
 
 	case 9:
@@ -236,46 +281,27 @@ void loop()
     }  
   }
   /* Serial communication end */
-
-
-
-
-
-
-
-  /* send data for maintenance, if show=1*/
-  if(showvalues)
-  {
-    if(millis()>serialTime)
-    {
-      //Print status
-      serialTime+=3000;
-    }
-  }
-
 }
-
 
 
 
 void printhelptext (void)
 {
-/* Welcome and help text */
-Serial.print(F("\nWelcome to WordClock Controller Interface\
-\n\r version 0.2\
-\n\r"));
-             
-Serial.print(F("\npossible commands are:\
-\n\r show= 0/1      show status off/on\
-\n\r help           help text\
-\n\r slb=0-255 	set led brightness 0-255\
-\n\r glb            get led brightness\
-\n\r slbp           store led brightness permanent\
-\n\r glbp           get permanent led brightness\
-\n\r slc=R,G,B      set led color (R,G,B) (0-255,0-255,0-255)\
-\n\r glc            get led color\
-\n\r slcp           store led color permanent\
-\n\r glcp           get permanent led color\
-\n\r"));
-
+  /* Welcome and help text */
+  Serial.print(F("\nWelcome to WordClock Controller Interface\
+  \n\r version 0.3\
+  \n\r"));
+               
+  Serial.print(F("\npossible commands are:\
+  \n\r show= 0/1      show status off/on\
+  \n\r help           help text\
+  \n\r slb=0-255 	set led brightness 0-255\
+  \n\r glb            get led brightness\
+  \n\r slbp           store led brightness permanent\
+  \n\r glbp           get permanent led brightness\
+  \n\r slc=R,G,B      set led color (R,G,B) (0-255,0-255,0-255)\
+  \n\r glc            get led color\
+  \n\r slcp           store led color permanent\
+  \n\r glcp           get permanent led color\
+  \n\r"));
 }
