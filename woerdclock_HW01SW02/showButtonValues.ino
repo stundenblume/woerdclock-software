@@ -4,27 +4,28 @@ void showButtonValues(int time){
   alreadyCalibrated();
   
   for (int j=1;j<4;j++)  {
-    showH(j);
+    resetAndBlack();
+    pushToStrip(j-1);
     int value = EEPROM.read(j)*4;
-    showINT(value);
+    showINT(j-1,value);
     delay(time);
   }
-  showH(4);  
-  showINT(hButtonValue);
+  pushToStrip(3);  
+  showINT(8,hButtonValue);
   delay(time);
   
-  showH(5);  
-  showINT(okButtonValue);
+  pushToStrip(2);  
+  showINT(10,okButtonValue);
   delay(time);
   
-  showH(6);  
-  showINT(mButtonValue);
+  pushToStrip(1);  
+  showINT(9,mButtonValue);
   delay(time);
 
-  showH(0);  
-  showM(0);  
-  showS(0);
-  delay(time/2);
+//  showH(0);  
+//  showM(0);  
+//  showS(0);
+//  delay(time/2);
 }
 
 

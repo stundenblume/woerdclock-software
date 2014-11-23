@@ -1,3 +1,4 @@
+#if IR
 void doIRLogic() {
 	uint8_t brightness = 0;
 	if (irrecv.decode(&irDecodeResults)) {
@@ -44,13 +45,13 @@ void doIRLogic() {
 				testHours = -1;
 				break;
 			case DIY2:
-				displayMode = DIY2;
+				displayMode = DISCO;
 				break;
 			case DIY3:
-				displayMode = DIY3;
+				displayMode = ANIM;
 				break;
 			case DIY4:
-				displayMode = DIY4;
+				displayMode = CLOCK;
 				break;
 			case DIY5:
 				displayMode = DIY5;
@@ -76,3 +77,4 @@ void doIRLogic() {
 		irrecv.resume();
 	}
 }
+#endif
