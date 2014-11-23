@@ -47,6 +47,7 @@ Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
 //****************************LED Config************************
 //Library includes
 #include <FastLED.h>
+#include <Wire.h>
 //LED defines
 #define NUM_LEDS 114
 
@@ -58,8 +59,8 @@ Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
   #define CLOCK 4
  
 //PIN defines
-#define STRIP_DATA_PIN 7
-#define ARDUINO_LED 5           //Default Arduino LED
+#define STRIP_DATA_PIN 21
+//#define ARDUINO_LED 5           //Default Arduino LED
 
 //LED varables
 uint8_t strip[NUM_LEDS];
@@ -84,7 +85,7 @@ CRGB leds[NUM_LEDS];
 //****************************Button Config**********************
 #if BUTTON
   #include <EEPROM.h>
-  #define ANALOGPIN 0              //Analogpin for Button and LDR
+  #define ANALOGPIN A1              //Analogpin for Button and LDR
   //Button variables
   #define CHARSHOWTIME 600
   #define AUTOENDTIME 5000
@@ -118,8 +119,8 @@ CRGB leds[NUM_LEDS];
   //#include <Time.h>
   //#include <DCF77.h>
   
-  #define DCF_PIN 3	         // Connection pin to DCF 77 device
-  #define DCF_INTERRUPT 1	 // Interrupt number associated with pin
+  #define DCF_PIN 7	         // Connection pin to DCF 77 device
+  #define DCF_INTERRUPT 4	 // Interrupt number associated with pin
   
   //dcf variables
   //time_t time;
@@ -162,14 +163,21 @@ CRGB leds[NUM_LEDS];
 #endif
 //****************************DHT11 Config**********************
 #if DHT11
-  #include <Wire.h>
+  #include "DHT.h"
+  #define DHTPIN 8   
+  #define DHTTYPE DHT11 
+DHT dht(DHTPIN, DHTTYPE);
+
+float humi = 0;
+float temp = 0;
+  
 #endif
 //****************************RFM12 Config**********************
 #if RFM12
   #include <RF12.h>
   //#include <util/crc16.h>
   //#include <util/parity.h>
-    #include <avr/eeprom.h>
+  #include <avr/eeprom.h>
   //#include <avr/pgmspace.h>
 #endif
 
@@ -211,7 +219,7 @@ void setup() {
 	
 	
 //****************Setup LED Matrix*******************
-        pinMode(ARDUINO_LED, OUTPUT);
+        //pinMode(ARDUINO_LED, OUTPUT);
 	
 	for(int i = 0; i<NUM_LEDS; i++) {
 		strip[i] = 0;
@@ -310,7 +318,7 @@ void setup() {
     #endif
 //***************setup DHT11****************************
     #if DHT11
-
+        dht.begin();
     #endif   
 //***************setup 10DOF****************************
     #if DOF
