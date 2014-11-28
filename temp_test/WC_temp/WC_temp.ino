@@ -3,10 +3,15 @@
 #include "FastLED.h"
 #include "DHT.h"
 
-#define WS2812BPIN 5
-#define BRIGHTNESS  50
+#define DHTPIN 2           // DHT11
 
-#define WS2812BCOUNT 114
+#define WS2812BPIN 5       //LEDS
+#define BRIGHTNESS  50     // LED Helligkeit
+
+#define WS2812BCOUNT 114   // LED Anzahl
+
+const int numbers[2] = {X_ORIGIN, Y_ORIGIN, Z_ORIGIN};
+
 CRGB leds[WS2812BCOUNT];
 
 int temperatur = 22;
@@ -18,7 +23,7 @@ void setup()  {
     }
    FastLED.addLeds<WS2812B, WS2812BPIN, RGB>(leds, WS2812BCOUNT);
    FastLED.setBrightness( BRIGHTNESS );
-   selftest(1000);
+   selftest(500);
 }
 void loop()  {
 }
