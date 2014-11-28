@@ -1,25 +1,13 @@
 /*
-Serial Communication Modul for Wördclock v0.4b by Marcel Müller
+Serial Communication Modul for Wördclock v0.5 by Marcel Müller
 based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz
-
-ToDo:
--before we implement this to woerdclock.ino
--we have to clearify the usage of all the serial ports, any idea?
--- actually, we have three ways for serial communication and I realized all:
---- serial across usb, see Serial_interprete() with "Serial"
---- serial across bluetooth with TX,RX on pin 0,1, see Serial1_interprete() with "Serial1"
---- serial across bluetooth with TX,RX on other pins via SoftSerial, see BTSerial_interprete() with "BTSerial" - here pin 4,5
--because of memory size, we should use only one solution
 
 Jobs of this modul:
 check if serial communication is available
-- via usb, then use usb
-- via bluetooth, then use bluetooth
-- via WiFi, then use WiFi
+[x] via usbb
+[x] via bluetooth, then use bluetooth
+[-] via WiFi (not implemented)
 if no communication is available, do something else in the loop
-
-In version 0.1, 0.2, 0,3 usb serial only
-Since version 0.4b with bluetooth
 
 /*
 Tested with Arduino IDE 1.5.7
@@ -54,13 +42,11 @@ Implemented commands are
   BTSerial with SoftwareSerial is for serial communication across bluetooth via SoftSerial
 */
 
-long BAUDRATE = 57600;                                // default Baudrate for serial communication
-
-/*SoftSerial*/
-//#define BTrxPin 9
-//#define BTtxPin 8
-//SoftwareSerial BTSerial(BTrxPin, BTtxPin);
-SoftwareSerial BTSerial(9,8);
+long BAUDRATE = 9600; // default Baudrate for serial communication
+/* SoftSerial
+    Connect Arduino Micro pin 9 with HC-06 pin RX and Arduino Micro pin 8 with HC-06 pin TX
+*/
+SoftwareSerial BTSerial(8, 9);
 
 /* Start command definitions for serial communication*/
 /*
@@ -104,29 +90,29 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 
 
 
-boolean showvalues;
 byte LEDbright = EEPROM.read(0);
 byte LEDcolorR = EEPROM.read(1);
 byte LEDcolorG = EEPROM.read(2);
 byte LEDcolorB = EEPROM.read(3);
-unsigned long  serialTime;
+
+boolean showvalues = false;
 
 
 
 void setup()
 {
 /* You need this in your setup */
-  BAUDRATE = 57600;
 
   int i;
-
+  BAUDRATE = 9600;
   Serial.begin(BAUDRATE);       // initialize serial port for usb
-  //Serial1.begin(BAUDRATE);      // initialize serial port for bluetooth pin 0,1
-  BTSerial.begin(BAUDRATE);     // initialize SoftSerial port for bluetooth pin 4,5
+  Serial1.begin(BAUDRATE);      // initialize serial port for bluetooth via pin 0,1
+  BTSerial.begin(BAUDRATE);     // initialize SoftSerial port for bluetooth via pin 2,3
   
   for(i=0; i++; i<paraCount)
     cmd[i][0]='\0';
 /* You need this in your setup */
+
 }
 
 
@@ -134,21 +120,9 @@ void setup()
 void loop()
 {
   /* The functions are the same, but they use different serial ports */
-  //Serial1_interprete(); // interprete command from bluetooth
-  //Serial_interprete(); // interprete commands from serial usb
+  Serial1_interprete(); // interprete command from bluetooth (pin 0,1)
+  Serial_interprete(); // interprete commands from serial port (usb)
   BTSerial_interprete(); // interprete commands from bluetooth
-  
-  /* send data for maintenance, if show=1
-  if(showvalues)
-  {
-    if(millis()>serialTime)
-    {
-      //Print status
-      serialTime+=3000;
-    }
-  }
-*/
-
 }
 
 

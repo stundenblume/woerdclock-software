@@ -149,7 +149,7 @@ void printhelptext (void)
 {
   /* Welcome and help text */
   Serial.print(F("\nWelcome to WordClock Controller Interface\
-  \n\r version 0.4b\
+  \n\r version 0.5\
   \n\r"));
                
   Serial.print(F("\npossible commands are:\

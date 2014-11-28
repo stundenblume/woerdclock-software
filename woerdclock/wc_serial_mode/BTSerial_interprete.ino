@@ -1,15 +1,16 @@
 /* 
-  Use the serial communication across bluetooth via SoftSerial
+  Use the serial communication across bluetooth via softserial e.g. pin 8,9
   Try Bluetooth Terminal for serial communication via mobile
   
-  state: untested
+  state: tested, works fine
 */
 void BTSerial_interprete(void)
 {
-  /* BTSerial communication start */
+  /* Serial1 communication start */
   int i,j,k;
-
+ //BTSerial.println("hmmm");//debug
   if(BTSerial.available()){                   // check to see if at least one character is available
+ //BTSerial.println("available");//debug
     char ch=BTSerial.read();
     //BTSerial.print(ch);                       // no echo
     if(int(ch)>32)                          // ignore spaces 
@@ -43,6 +44,9 @@ void BTSerial_interprete(void)
         if(!strcmp(cmd[0],cmdStrCon[i]))
           j=i;
       }
+      
+  //BTSerial.print("j=");//debug
+  //BTSerial.println(j);//debug
       switch(j){
 
       case  0: 
@@ -138,15 +142,14 @@ void BTSerial_interprete(void)
       i=0;  
     }  
   }
-  /* BTSerial communication end */
+  /* Serial1 communication end */
 }
-
 
 void printhelptext2 (void)
 {
   /* Welcome and help text */
   BTSerial.print(F("\nWelcome to WordClock Controller Interface\
-  \n\r version 0.4b\
+  \n\r version 0.5\
   \n\r"));
                
   BTSerial.print(F("\npossible commands are:\
