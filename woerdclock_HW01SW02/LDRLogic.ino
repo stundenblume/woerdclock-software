@@ -1,3 +1,4 @@
+#if LDR
 void doLDRLogic() {
 	if(millis() >= waitUntilLDR && autoBrightnessEnabled) {
 		DEBUG_PRINT("doing LDR logic");
@@ -15,3 +16,4 @@ void doLDRLogic() {
 		waitUntilLDR += oneSecondDelay;  
         }
 }
+#endif

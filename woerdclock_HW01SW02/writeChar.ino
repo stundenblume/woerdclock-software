@@ -1,218 +1,135 @@
-// font: http://robey.lag.net/2010/01/23/tiny-monospace-font.html
-
 void writeChar(char val){
-  //setBrightness(255);
-//  showH(0);
-//  showM(0);
-//  showS(0);
-
-
-//  delay(CHARSHOWTIME);
-//  showH(0);
-//  showM(0);
-//  showS(0);
-//  delay(CHARSHOWTIME/4);
-//}
-
-void shiftChar (){
-  for(i=9; i==0; i--){ 
+  int writeLED = 0;
+  DEBUG_PRINT("writeChar");
+  DEBUG_PRINT(val);
+  waitUntilwriteChar = millis();
   
-    if(millis() >= waitUntilwriteChar) {
-      waitUntilwriteChar = millis();
-      resetAndBlack();
-      pushToStrip(29);
-        switch (val){
-            case 'A':
-              pushToStrip(koordinate(1+i,2));
-              pushToStrip(koordinate(1+i,3));
-              pushToStrip(koordinate(1+i,4));
-              pushToStrip(koordinate(1+i,5));
-              pushToStrip(koordinate(1+i,6));
-              pushToStrip(koordinate(2+i,2));
-              pushToStrip(koordinate(2+i,4));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,4));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,3));
-              pushToStrip(koordinate(3+i,4));
-              pushToStrip(koordinate(3+i,5));
-              pushToStrip(koordinate(3+i,6));
-              break;
-            case 'B':
-              pushToStrip(koordinate(1+i,2));
-              pushToStrip(koordinate(1+i,3));
-              pushToStrip(koordinate(1+i,4));
-              pushToStrip(koordinate(1+i,5));
-              pushToStrip(koordinate(1+i,6));
-              pushToStrip(koordinate(2+i,2));
-              pushToStrip(koordinate(2+i,4));
-              pushToStrip(koordinate(2+i,6));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,4));
-              pushToStrip(koordinate(2+i,6));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,3));
-              pushToStrip(koordinate(3+i,4));
-              pushToStrip(koordinate(3+i,5));
-              pushToStrip(koordinate(3+i,6));
-              break;
-            case 'C':
-              pushToStrip(koordinate(1+i,2));
-              pushToStrip(koordinate(1+i,3));
-              pushToStrip(koordinate(1+i,4));
-              pushToStrip(koordinate(1+i,5));
-              pushToStrip(koordinate(1+i,6));
-              pushToStrip(koordinate(2+i,2));
-              pushToStrip(koordinate(2+i,6));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,6));
-              pushToStrip(koordinate(4+i,2));
-              pushToStrip(koordinate(4+i,6));
-              break;
-            case 'D':
-              pushToStrip(koordinate(1+i,2));
-              pushToStrip(koordinate(1+i,3));
-              pushToStrip(koordinate(1+i,4));
-              pushToStrip(koordinate(1+i,5));
-              pushToStrip(koordinate(1+i,6));
-              pushToStrip(koordinate(2+i,2));
-              pushToStrip(koordinate(2+i,6));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,6));
-              pushToStrip(koordinate(4+i,2));
-              pushToStrip(koordinate(4+i,3));
-              pushToStrip(koordinate(4+i,4));
-              pushToStrip(koordinate(4+i,5));
-              pushToStrip(koordinate(4+i,6));
-              break;
-            case 'E':
-              pushToStrip(koordinate(1+i,2));
-              pushToStrip(koordinate(1+i,3));
-              pushToStrip(koordinate(1+i,4));
-              pushToStrip(koordinate(1+i,5));
-              pushToStrip(koordinate(1+i,6));
-              pushToStrip(koordinate(2+i,2));
-              pushToStrip(koordinate(2+i,4));
-              pushToStrip(koordinate(2+i,6));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,4));
-              pushToStrip(koordinate(2+i,6));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,4));
-              pushToStrip(koordinate(3+i,6));
-              break;
-            case 'F':
-              pushToStrip(koordinate(1+i,2));
-              pushToStrip(koordinate(1+i,3));
-              pushToStrip(koordinate(1+i,4));
-              pushToStrip(koordinate(1+i,5));
-              pushToStrip(koordinate(1+i,6));
-              pushToStrip(koordinate(2+i,2));
-              pushToStrip(koordinate(2+i,4));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,4));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,4));
-              break;
-            case 'K':
-              pushToStrip(koordinate(1+i,2));
-              pushToStrip(koordinate(1+i,3));
-              pushToStrip(koordinate(1+i,4));
-              pushToStrip(koordinate(1+i,5));
-              pushToStrip(koordinate(1+i,6));
-              pushToStrip(koordinate(2+i,4));
-              pushToStrip(koordinate(2+i,4));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,4));
-              pushToStrip(koordinate(3+i,2));
-              pushToStrip(koordinate(3+i,4));
-              break;
-            case 'L':
-              showH(2+4+8);
-              showM(1+4+16);
-              showS(1+2+4+16);
-              break;
-            case 'M':
-              showH(1+2+4+8+16);
-              showM(4);
-              showS(1+2+4+8+16);
-              break;
-            case 'N':
-              showH(1+16);
-              showM(1+2+4+8+16);
-              showS(1+16);
-              break;
-            case 'O':
-              showH(1+2+4+8+16);
-              showM(1);
-              showS(1);
-              break;
-            case 'P':
-              showH(1+2+4+8+16);
-              showM(4+8);
-              showS(1+2+4+8+16);
-              break;
-            case 'Q':
-              showH(1+2+4+8+16);
-              showM(2+4+8);
-              showS(1+2+4+8+16);
-              break;
-            case 'R':
-              showH(1+2+4+8+16);
-              showM(2+4+16);
-              showS(1+4+8);
-              break;
-            case 'S':
-              showH(1+8);
-              showM(1+4+16);
-              showS(2+16);
-              break;
-            case 'T':
-              showH(16);
-              showM(1+2+4+8+16);
-              showS(16);
-              break;
-            case 'U':
-              showH(2+4+8+16);
-              showM(1);
-              showS(1+2+4+8+16);
-              break;
-            case 'V':
-              showH(2+8);
-              showM(4);
-              showS(2+8);
-              break;
-            case 'W':
-              showH(2+8);
-              showM(4);
-              showS(2+8);
-              break;
-            case 'X':
-              showH(2+8);
-              showM(4);
-              showS(2+8);
-              break;
-            case 'Y':
-              showH(2+8);
-              showM(4);
-              showS(2+8);
-              break;
-            case 'Z':
-              showH(2+8);
-              showM(4);
-              showS(2+8);
-              break;
-            case ' ':
-              break;
-            default:
-              showH(1);
-              showM(1);
-              showS(1);
-  }   
-      displayStrip(CRGB::Red);
-     }
-     waitUntilwriteChar += oneSecondDelay;
-  }
+  for(int i=9; i>=0; i--){ 
+      DEBUG_PRINT("for");  
+      if(millis() >= waitUntilwriteChar) {
+        DEBUG_PRINT("if");
+          waitUntilwriteChar = millis();
+          resetAndBlack();
+            for(int j=0;j<9;j++){
+               for(int k=10-i;k>0;k--){
+                        switch (val){
+                            case 'A':
+                              writeLED = arrayA[k][j];
+                              break;
+                            case 'B':
+                              writeLED = arrayB[k][j];
+                              break;
+                            case 'C':
+                              writeLED = arrayC[k][j];
+                              break;
+                            case 'D':
+                              writeLED = arrayD[k][j];
+                              break;
+                            case 'E':
+                              writeLED = arrayE[k][j];
+                              break;
+                            case 'F':
+                              writeLED = arrayF[k][j];
+                              break;
+                            case 'K':
+                              writeLED = arrayK[k][j];
+                              break;
+                            case 'L':
+                              writeLED = arrayL[k][j];
+                              break;
+                            case 'M':
+                              writeLED = arrayM[k][j];
+                              break;
+                            case 'N':
+                              writeLED = arrayN[k][j];
+                              break;
+                            case 'O':
+                              writeLED = arrayO[k][j];
+                              break;
+                            case 'P':
+                              writeLED = arrayP[k][j];
+                              break;
+                            case 'Q':
+                              writeLED = arrayQ[k][j];
+                              break;
+                            case 'R':
+                              writeLED = arrayR[k][j];
+                              break;
+                            case 'S':
+                              writeLED = arrayS[k][j];
+                              break;
+                            case 'T':
+                              writeLED = arrayT[k][j];
+                              break;
+                            case 'U':
+                              writeLED = arrayU[k][j];
+                              break;
+                            case 'V':
+                              writeLED = arrayV[k][j];
+                              break;
+                            case 'W':
+                              writeLED = arrayW[k][j];
+                              break;
+                            case 'X':
+                              writeLED = arrayX[k][j];
+                              break;
+                            case 'Y':
+                              writeLED = arrayY[k][j];
+                              break;
+                            case 'Z':
+                              writeLED = arrayZ[k][j];
+                              break;
+                            case ' ':         
+                              break;
+                            case '1':
+                              writeLED = array1[k][j];
+                              break;
+                            case '2':
+                              writeLED = array2[k][j];
+                              break;
+                            case '3':
+                              writeLED = array3[k][j];
+                              break;
+                            case '4':
+                              writeLED = array4[k][j];
+                              break;
+                            case '5':
+                              writeLED = array5[k][j];
+                              break;
+                            case '6':
+                              writeLED = array6[k][j];
+                              break;
+                            case '7':
+                              writeLED = array7[k][j];
+                              break;
+                            case '8':
+                              writeLED = array8[k][j];
+                              break;
+                            case '9':
+                              writeLED = array9[k][j];
+                              break;
+                            case '0':
+                              writeLED = array0[k][j];
+                              break;     
+                            default:
+                              pushToStrip(0);
+                              pushToStrip(1);
+                              pushToStrip(2);
+                              pushToStrip(3);
+                          }
+                       if (writeLED == 1){
+                         pushToStrip(koordinate(k+1,j));
+                       }
+                 }
+            }   
+          displayStrip(CRGB::Red);
+        }
+        waitUntilwriteChar += oneSecondDelay;
+        while(millis() < waitUntilwriteChar){
+           //DEBUG_PRINT("while");
+          //delay(10);
+        }
+    }    
 }
 
 

@@ -19,16 +19,26 @@ boolean buttonCalibration(){
     // display wich button value is saved
     switch (i){
     case 1:
-      showS(1+2);
+      resetAndBlack();
+      pushToStrip(3);
       break;
     case 2:
-      showS(1);
+      resetAndBlack();
+      pushToStrip(3);
+      pushToStrip(2);
       break;
     case 3:
-      showS(0);
+      resetAndBlack();
+      pushToStrip(3);
+      pushToStrip(2);
+      pushToStrip(1);
       break;
     default:
-      showS(1+2+8+16);
+      resetAndBlack();
+      pushToStrip(0);
+      pushToStrip(1);
+      pushToStrip(2);
+      pushToStrip(3);
     }
     while(analogRead(ANALOGPIN)>10) delay (10);
     start=millis();
