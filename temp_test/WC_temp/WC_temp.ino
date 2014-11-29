@@ -4,13 +4,15 @@
 #include "DHT.h"
 
 #define DHTPIN 2           // DHT11
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
 
 #define WS2812BPIN 5       //LEDS
 #define BRIGHTNESS  50     // LED Helligkeit
+#define COLOR_ORDER GRB
 
 #define WS2812BCOUNT 114   // LED Anzahl
 
-const int numbers[2] = {X_ORIGIN, Y_ORIGIN, Z_ORIGIN};
 
 CRGB leds[WS2812BCOUNT];
 
@@ -21,10 +23,14 @@ void setup()  {
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
     }
-   FastLED.addLeds<WS2812B, WS2812BPIN, RGB>(leds, WS2812BCOUNT);
+   Serial.println("Selftest");
+   FastLED.addLeds<WS2812B, WS2812BPIN, COLOR_ORDER>(leds, WS2812BCOUNT);
    FastLED.setBrightness( BRIGHTNESS );
    selftest(500);
+   Serial.println("!!!Test!!!");
+   dht.begin();
 }
 void loop()  {
+  dhtsensor();
 }
 

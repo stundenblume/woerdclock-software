@@ -4,16 +4,13 @@
 **~~DHT11~~**
 *************
 
-
+*/
 // Example testing sketch for various DHT humidity/temperature sensors
 // Written by ladyada, public domain
 
 
-
-#define DHTPIN 2     // what pin we're connected to
-
 // Uncomment whatever type you're using!
-#define DHTTYPE DHT11   // DHT 11 
+   // DHT 11 
 //#define DHTTYPE DHT22   // DHT 22  (AM2302)
 //#define DHTTYPE DHT21   // DHT 21 (AM2301)
 
@@ -25,7 +22,7 @@
 // Connect a 10K resistor from pin 2 (data) to pin 1 (power) of the sensor
 
 // Initialize DHT sensor for normal 16mhz Arduino
-DHT dht(DHTPIN, DHTTYPE);
+
 // NOTE: For working with a faster chip, like an Arduino Due or Teensy, you
 // might need to increase the threshold for cycle counts considered a 1 or 0.
 // You can do this by passing a 3rd parameter for this threshold.  It's a bit
@@ -35,14 +32,7 @@ DHT dht(DHTPIN, DHTTYPE);
 // Example to initialize DHT sensor for Arduino Due:
 //DHT dht(DHTPIN, DHTTYPE, 30);
 
-void setup() {
-  Serial.begin(9600); 
-  Serial.println("DHTxx test!");
- 
-  dht.begin();
-}
-
-void loop() {
+void dhtsensor(){
   // Wait a few seconds between measurements.
   delay(2000);
 
@@ -64,16 +54,16 @@ void loop() {
   // Must send in temp in Fahrenheit!
   float hi = dht.computeHeatIndex(f, h);
 
-  Serial.print("Humidity: "); 
+  Serial.print("Feuchte: "); 
   Serial.print(h);
-  Serial.print(" %\t");
-  Serial.print("Temperature: "); 
+  Serial.print(" %");
+  Serial.println("Temperature: "); 
   Serial.print(t);
   Serial.print(" *C ");
-  Serial.print(f);
+  Serial.println(f);
   Serial.print(" *F\t");
   Serial.print("Heat index: ");
   Serial.print(hi);
   Serial.println(" *F");
 }
-*/
+
