@@ -1,18 +1,5 @@
-/*
-
-*************
-**~~DHT11~~**
-*************
-
-*/
 // Example testing sketch for various DHT humidity/temperature sensors
 // Written by ladyada, public domain
-
-
-// Uncomment whatever type you're using!
-   // DHT 11 
-//#define DHTTYPE DHT22   // DHT 22  (AM2302)
-//#define DHTTYPE DHT21   // DHT 21 (AM2301)
 
 // Connect pin 1 (on the left) of the sensor to +5V
 // NOTE: If using a board with 3.3V logic like an Arduino Due connect pin 1
@@ -34,7 +21,7 @@
 
 void dhtsensor(){
   // Wait a few seconds between measurements.
-  delay(2000);
+  if(DHT_TIMER >= 5000){
 
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
@@ -53,17 +40,20 @@ void dhtsensor(){
   // Compute heat index
   // Must send in temp in Fahrenheit!
   float hi = dht.computeHeatIndex(f, h);
+  int dht11_temp =
 
-  Serial.print("Feuchte: "); 
+  Serial.print("Feuchte:");
   Serial.print(h);
-  Serial.print(" %");
-  Serial.println("Temperature: "); 
+  Serial.println(" %");
+  Serial.print("Temperatur: "); 
   Serial.print(t);
   Serial.print(" *C ");
-  Serial.println(f);
-  Serial.print(" *F\t");
-  Serial.print("Heat index: ");
-  Serial.print(hi);
-  Serial.println(" *F");
+  Serial.print(f);
+  Serial.println(" *F\t");
+  DHT_TIMER = 0;
+  } else {
+  Serial.print(DHT_TIMER);
+  DHT_TIMER++;
+  }
 }
 

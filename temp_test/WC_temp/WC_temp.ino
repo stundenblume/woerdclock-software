@@ -1,8 +1,31 @@
+/*
+................-......-...............
+..............-@W......W@-.............
+............-@WWW......WWW@-...........
+..........-@WWWWW......WWWWW@-.........
+........-@WWW*WWW......WWW*WWW@-.......
+......-@W#:...WWW......WWW-..:#W@-.....
+....-@*...:...WWW......WWW-..:...*@-...
+.....-*@WWW-..WWW......WWW-..WWW@*-....
+.+@WWWWWWWW-..WWWWWWWWWWWW-..WWWWWWWW@+
+.-@WW=*=WWW-..WWW======WWW-..WWW===WW@-
+...-@...WWW-..WWW......WWW-..WWW...@-..
+........WWW...WWW......WWW-..WWW.......
+........@WW...WWW......WWW-..WW@.......
+.........-@...WWW......WWW-..@-........
+..............WWW......WWW-............
+..............@WW......WW@.............
+...............-@......@-..............
+V0.1 by KeyJay.........................
+*/
+
+//LIBRARYS//
 #include <Wire.h>
 #include "RTClib.h"
 #include "FastLED.h"
 #include "DHT.h"
 
+//MODULES//
 #define DHTPIN 2           // DHT11
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
@@ -13,11 +36,15 @@ DHT dht(DHTPIN, DHTTYPE);
 
 #define WS2812BCOUNT 114   // LED Anzahl
 
-
+uint8_t strip[WS2812BCOUNT];
+uint8_t stackptr = 0;
 CRGB leds[WS2812BCOUNT];
 
-int temperatur = 22;
 
+int temperatur = 22;
+int DHT_TIMER = 0;
+
+//SETUP//
 void setup()  {
   Serial.begin(9600);
   while (!Serial) {
@@ -26,10 +53,11 @@ void setup()  {
    Serial.println("Selftest");
    FastLED.addLeds<WS2812B, WS2812BPIN, COLOR_ORDER>(leds, WS2812BCOUNT);
    FastLED.setBrightness( BRIGHTNESS );
-   selftest(500);
+   selftest(250);
    Serial.println("!!!Test!!!");
    dht.begin();
 }
+//LOOP//
 void loop()  {
   dhtsensor();
 }
