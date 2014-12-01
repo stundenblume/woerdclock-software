@@ -1,4 +1,4 @@
 woerdclock-software
 ===================
 
-wördclock, a Arduino powered and WS2812B featured Wordclock.
+Wördclock, a Arduino powered and WS2812B featured Wordclock.
