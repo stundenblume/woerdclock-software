@@ -1,148 +1,145 @@
-//void writeChar(char val){
-//  int writeLED = 0;
-//  //DEBUG_PRINT("writeChar");
-//  //DEBUG_PRINT(val);
-//  waitUntilwriteChar = millis();
-//  
-//  for(int i=9; i>=0; i--){ 
-//      //DEBUG_PRINT("for");  
-//      if(millis() >= waitUntilwriteChar) {
-//        //DEBUG_PRINT("if");
-//          waitUntilwriteChar = millis();
-//          resetAndBlack();
-//            for(int j=0;j<9;j++){
-//               for(int k=9-i;k>=0;k--){
-//                        switch (val){
-//                            case 'A':
-//                              writeLED = arrayA[k][j];
+void writeChar(char val){
+  int writeLED = 0;
+  int l = 10;                                     //erste Spalte schreiben
+  //DEBUG_PRINT("writeChar");
+  //DEBUG_PRINT(val);
+  
+  for(int k=0;k<10;k++){                          //verschieben des Buchstaben in den Zeilen
+ 
+            resetAndBlack();
+            for(int i=0;i<6;i++){                        //Zeile Buchstabe
+               for(int j=0;j<10;j++){                     //Spalte Buchstabe
+                        switch (val){
+                            case 'A':
+                              writeLED = arrayA[i][j];
+                              break;
+                            case 'B':
+                              writeLED = arrayB[i][j];
+                              break;
+                            case 'C':
+                              writeLED = arrayC[i][j];
+                              break;
+                            case 'D':
+                              writeLED = arrayD[k][j];
+                              break;
+                            case 'E':
+                              writeLED = arrayE[i][j];
+                              break;
+//                            case 'F':
+//                              writeLED = arrayF[i][j];
 //                              break;
-//                            case 'B':
-//                              writeLED = arrayB[k][j];
+//                            case 'G':
+//                              writeLED = arrayG[i][j];
 //                              break;
-//                            case 'C':
-//                              writeLED = arrayC[k][j];
+                            case 'H':
+                              writeLED = arrayH[i][j];
+                              break;
+                            case 'I':
+                              writeLED = arrayI[i][j];
+                              break;
+//                            case 'J':
+//                              writeLED = arrayJ[i][j];
 //                              break;
-//                            case 'D':
-//                              writeLED = arrayD[k][j];
+//                            case 'K':
+//                              writeLED = arrayK[i][j];
 //                              break;
-//                            case 'E':
-//                              writeLED = arrayE[k][j];
+                            case 'L':
+                              writeLED = arrayL[i][j];
+                              break;
+//                            case 'M':
+//                              writeLED = arrayM[i][j];
 //                              break;
-////                            case 'F':
-////                              writeLED = arrayF[k][j];
-////                              break;
-////                            case 'G':
-////                              writeLED = arrayG[k][j];
-////                              break;
-//                            case 'H':
-//                              writeLED = arrayH[k][j];
+                            case 'N':
+                              writeLED = arrayN[i][j];
+                              break;
+                            case 'O':
+                              writeLED = arrayO[i][j];
+                              break;
+//                            case 'P':
+//                              writeLED = arrayP[i][j];
 //                              break;
-//                            case 'I':
-//                              writeLED = arrayI[k][j];
+//                            case 'Q':
+//                              writeLED = arrayQ[i][j];
 //                              break;
-////                            case 'J':
-////                              writeLED = arrayJ[k][j];
-////                              break;
-////                            case 'K':
-////                              writeLED = arrayK[k][j];
-////                              break;
-//                            case 'L':
-//                              writeLED = arrayL[k][j];
+                            case 'R':
+                              writeLED = arrayR[i][j];
+                              break;
+//                            case 'S':
+//                              writeLED = arrayS[i][j];
 //                              break;
-////                            case 'M':
-////                              writeLED = arrayM[k][j];
-////                              break;
-//                            case 'N':
-//                              writeLED = arrayN[k][j];
+                            case 'T':
+                              writeLED = arrayT[i][j];
+                              break;
+                            case 'U':
+                              writeLED = arrayU[i][j];
+                              break;
+//                            case 'V':
+//                              writeLED = arrayV[i][j];
 //                              break;
-//                            case 'O':
-//                              writeLED = arrayO[k][j];
+//                            case 'W':
+//                              writeLED = arrayW[i][j];
 //                              break;
-////                            case 'P':
-////                              writeLED = arrayP[k][j];
-////                              break;
-////                            case 'Q':
-////                              writeLED = arrayQ[k][j];
-////                              break;
-//                            case 'R':
-//                              writeLED = arrayR[k][j];
+//                            case 'X':
+//                              writeLED = arrayX[i][j];
 //                              break;
-////                            case 'S':
-////                              writeLED = arrayS[k][j];
-////                              break;
-//                            case 'T':
-//                              writeLED = arrayT[k][j];
+//                            case 'Y':
+//                              writeLED = arrayY[i][j];
 //                              break;
-//                            case 'U':
-//                              writeLED = arrayU[k][j];
+//                            case 'Z':
+//                              writeLED = arrayZ[i][j];
 //                              break;
-////                            case 'V':
-////                              writeLED = arrayV[k][j];
-////                              break;
-////                            case 'W':
-////                              writeLED = arrayW[k][j];
-////                              break;
-////                            case 'X':
-////                              writeLED = arrayX[k][j];
-////                              break;
-////                            case 'Y':
-////                              writeLED = arrayY[k][j];
-////                              break;
-////                            case 'Z':
-////                              writeLED = arrayZ[k][j];
-////                              break;
-//                            case ' ':         
-//                              break;
-//                            case '1':
-//                              writeLED = array1[k][j];
-//                              break;
-//                            case '2':
-//                              writeLED = array2[k][j];
-//                              break;
-//                            case '3':
-//                              writeLED = array3[k][j];
-//                              break;
-//                            case '4':
-//                              writeLED = array4[k][j];
-//                              break;
-//                            case '5':
-//                              writeLED = array5[k][j];
-//                              break;
-//                            case '6':
-//                              writeLED = array6[k][j];
-//                              break;
-//                            case '7':
-//                              writeLED = array7[k][j];
-//                              break;
-//                            case '8':
-//                              writeLED = array8[k][j];
-//                              break;
-//                            case '9':
-//                              writeLED = array9[k][j];
-//                              break;
-//                            case '0':
-//                              writeLED = array0[k][j];
-//                              break;     
-//                            default:
-//                              pushToStrip(0);
-//                              pushToStrip(1);
-//                              pushToStrip(2);
-//                              pushToStrip(3);
-//                          }
-//                       if (writeLED == 1){
-//                         pushToStrip(koordinate(k+1+i,j));
-//                       }
-//                 }
-//            }   
-//          displayStrip(CRGB::Red);
-//        }
-//        waitUntilwriteChar += oneSecondDelay;
-//        while(millis() < waitUntilwriteChar){
-//           //DEBUG_PRINT("while");
-//          //delay(10);
-//        }
-//    }    
-//}
-//
-//
+                            case ' ':         
+                              break;
+                            case '1':
+                              writeLED = array1[i][j];
+                              break;
+                            case '2':
+                              writeLED = array2[i][j];
+                              break;
+                            case '3':
+                              writeLED = array3[i][j];
+                              break;
+                            case '4':
+                              writeLED = array4[i][j];
+                              break;
+                            case '5':
+                              writeLED = array5[i][j];
+                              break;
+                            case '6':
+                              writeLED = array6[i][j];
+                              break;
+                            case '7':
+                              writeLED = array7[i][j];
+                              break;
+                            case '8':
+                              writeLED = array8[i][j];
+                              break;
+                            case '9':
+                              writeLED = array9[i][j];
+                              break;
+                            case '0':
+                              writeLED = array0[i][j];
+                              break;     
+                            default:
+                              pushToStrip(0);
+                              pushToStrip(1);
+                              pushToStrip(2);
+                              pushToStrip(3);
+                          }
+                       if (writeLED == 1){
+                         pushToStrip(koordinate(l,j));
+                       }
+                 }
+                 if (k == i){                  //letzte Spalte?
+                  i=6;
+                 }
+            }   
+          displayStrip(CRGB::Red);
+          delay(1000);                                  //verzögerung für die Verschiebung
+          l--;                                 //Spalte in der Matrix nach links
+    }
+    
+}
+
+
 
