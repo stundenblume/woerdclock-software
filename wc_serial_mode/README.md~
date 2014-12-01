@@ -61,4 +61,3 @@ Implemented commands are
   
   slcp = set_led_color_permanent (store in EEPROM)
   glcp = get_led_color_permanent (get from EEPROM)
-  ...
