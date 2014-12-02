@@ -39,9 +39,11 @@ void adjustTime(){
     DEBUG_PRINT("m");
     DEBUG_PRINT(m);
     delay(150);
+    
+    
   }
   if (RTCpresent && ok){
-    RTC.adjust(DateTime(2014,11,30,h,m,0));
+    RTC.adjust(DateTime(ye, mo, da, h, m, 0));
   } // if the RTC is present, store the new time in the RTC
 }
 

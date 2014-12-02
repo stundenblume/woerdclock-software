@@ -127,12 +127,12 @@ void writeChar(char val){
 //                              pushToStrip(3);
                           }
                        if (writeLED == 1){
-                         pushToStrip(koordinate(l,j));
+                         pushToStrip(koordinate(l+i,j));
                        }
                  }
-//                 if (k == i){                  //letzte Spalte?
-//                  i=6;
-//                 }
+                 if (k == i){                  //letzte Spalte?
+                  i=6;
+                 }
             }   
           displayStrip(CRGB::Blue);
           delay(1000);                                  //verzögerung für die Verschiebung
