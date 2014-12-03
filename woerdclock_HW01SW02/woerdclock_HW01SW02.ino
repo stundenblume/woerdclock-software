@@ -49,7 +49,7 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define SDCARD 0     //Module SD Card
 #define MIC 0        //Module Microfon
 #define IR 0         //Module IR
-#define DHT11 0      //Module DHT11
+#define DHT11 1      //Module DHT11
 #define RFM12 0      //Module RMF12B
 
 //Debug Mode or not (uncommand)
@@ -218,8 +218,11 @@ CRGB leds[NUM_LEDS];
   #define DHTTYPE DHT11 
   DHT dht(DHTPIN, DHTTYPE);
 
-  float humi = 0;
-  float temp = 0;
+  int humi = 0;
+  int temp = 0;
+  
+//  int temperatur = 22;
+  int DHT_TIMER = 0;
   
 #endif
 //****************************RFM12 Config**********************
@@ -432,18 +435,23 @@ void loop() {
                         clockLogic();
 			break;
 	}
+#if DHT11
+                dhtRead();
+#endif
 }
 
-#if DCF
-//unsigned long getDCFTime() {
-//	time_t DCFtime = DCF.getTime();
-//	// Indicator that a time check is done
-//	if (DCFtime!=0) {
-//		DEBUG_PRINT("sync");
-//	}
-//	return DCFtime;
-//}
-#endif
+        #if DCF
+        //unsigned long getDCFTime() {
+        //	time_t DCFtime = DCF.getTime();
+        //	// Indicator that a time check is done
+        //	if (DCFtime!=0) {
+        //		DEBUG_PRINT("sync");
+        //	}
+        //	return DCFtime;
+        //}
+        #endif
+
+        
 
 //***********************DISPLAY MODES**********************
 

@@ -99,12 +99,12 @@ void writeChar(char val){
                             case '3':
                               writeLED = array3[i][j];
                               break;
-//                            case '4':
-//                              writeLED = array4[i][j];
-//                              break;
-//                            case '5':
-//                              writeLED = array5[i][j];
-//                              break;
+                            case '4':
+                              writeLED = array4[i][j];
+                              break;
+                            case '5':
+                              writeLED = array5[i][j];
+                              break;
 //                            case '6':
 //                              writeLED = array6[i][j];
 //                              break;
