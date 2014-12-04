@@ -1,54 +1,70 @@
 #if DHT11
 
 void dhtRead(){
-  // Wait a few seconds between measurements.
-  if(DHT_TIMER >= 5000){
   
-  // Reading temperature or humidity takes about 250 milliseconds!
-  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-  humi = dht.readHumidity();
-  // Read temperature as Celsius
-  temp = dht.readTemperature();
+  if(millis() >= waitUntilDHT) {
+    // Wait a few seconds between measurements.
+    if(DHT_TIMER >= 5000){
+  
+    // Reading temperature or humidity takes about 250 milliseconds!
+    // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+    humi = dht.readHumidity();
+    // Read temperature as Celsius
+    temp = dht.readTemperature();
 
   
-  // Check if any reads failed and exit early (to try again).
-    if (isnan(humi) || isnan(temp)) {
-      #ifdef DEBUG
-      Serial.println("Failed to read from DHT sensor!");
-      #endif
-      return;
-    }
+      // Check if any reads failed and exit early (to try again).
+        if (isnan(humi) || isnan(temp)) {
+          #ifdef DEBUG
+          Serial.println("Failed to read from DHT sensor!");
+          #endif
+          return;
+        }
 
   // Compute heat index
   // Must send in temp in Fahrenheit!
 //  float hi = dht.computeHeatIndex(f, h);
 //  int dht11_temp =
-#ifdef DEBUG
-  Serial.print("Feuchte:");
-  Serial.print(humi);
-  Serial.println(" %");
-  Serial.print("Temperatur: "); 
-  Serial.print(temp);
-  Serial.print(" *C ");
-  Serial.println();
-#endif
+    #ifdef DEBUG
+      Serial.print("Feuchte:");
+      Serial.print(humi);
+      Serial.println(" %");
+      Serial.print("Temperatur: "); 
+      Serial.print(temp);
+      Serial.print(" *C ");
+      Serial.println();
+    #endif
   
-  int firstnumber = temp/10;
-  int secondnumber = temp%10;
-  int check = 0;
-  if (firstnumber > 0){
-    writedht(firstnumber); 
-  }
-  writedht(secondnumber);
+    int firstnumber = temp/10;
+    int secondnumber = temp%10;
+    //int check = 0;
+    if (firstnumber > 0){
+      writedht(firstnumber);
+      #ifdef DEBUG
+      Serial.print("firstdhttemp=");
+      Serial.print(firstnumber);
+      Serial.println(); 
+      #endif
+    }
+    writedht(secondnumber);
+    #ifdef DEBUG
+      Serial.print("seconddhttemp=");
+      Serial.print(secondnumber);
+      Serial.println(); 
+     #endif
   
-  DHT_TIMER = 0;
+    DHT_TIMER = 0;
+    } 
+    else {
+//    #ifdef DEBUG
+//    Serial.print("DHTtimer=");   
+//    Serial.print(DHT_TIMER);
+//    Serial.println();
+//    #endif   
+    DHT_TIMER++;
+    }
+   waitUntilDHT += oneSecondDelay; 
   } 
-  else {
-#ifdef DEBUG   
-  Serial.print(DHT_TIMER);
-#endif   
-  DHT_TIMER++;
-  }
 }
 
 void writedht(int check){
@@ -64,7 +80,7 @@ void writedht(int check){
         else if (i==check) writeChar('8');
         else if (i==check) writeChar('9');
         else if (i==check) writeChar('0');
-    }
+    }  
 }
 
 #endif

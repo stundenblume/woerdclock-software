@@ -254,6 +254,7 @@ long waitUntilHeart = 0;
 long waitUntilDCF = 0;
 long waitUntilLDR = 0;
 long waitUntilwriteChar = 0;
+long waitUntilDHT = 0;
 
 //****************************Debug Config**********************
 #ifdef DEBUG
@@ -319,12 +320,6 @@ void setup() {
 	  pushToStrip(1);
           pushToStrip(2);
           displayStrip(CRGB::Blue);
-          DEBUG_PRINT("Debug");
-//          writeChar('D');
-//          writeChar('E');
-//          writeChar('B');
-//          writeChar('U');
-//          writeChar('G');
           
         }
         if (!menue && !debugmod){                        //No debug no menue, normal start
@@ -332,21 +327,11 @@ void setup() {
 	    pushToStrip(3);
             pushToStrip(1);
             displayStrip(CRGB::Green);
-            DEBUG_PRINT("Hi");
-//          writeChar('H');
-//          writeChar('I');
+
         }
      
         boolean calibOK = alreadyCalibrated();           // Check if there is was already a calibration of the buttons 
-        DEBUG_PRINT("cali=");
-        DEBUG_PRINT(calibOK);
         if (!calibOK || menue) buttonCalibration();      // if there wasn't already a calibration OR jumper is open, do the calibration
-//        DEBUG_PRINT("hButton=");
-//        DEBUG_PRINT(hButtonValue);
-//        DEBUG_PRINT("mButton=");
-//        DEBUG_PRINT(mButtonValue);
-//        DEBUG_PRINT("okButton=");
-//        DEBUG_PRINT(okButtonValue);
         if (menue && calibOK) adjustTime(); // if the jumper ist open AND the there is al calibration for the buttonValus, go to adjust the time
      #endif
 
@@ -415,6 +400,21 @@ void loop() {
         selectModus();
     #endif
     
+    #if DHT11
+        dhtRead();
+    #endif
+    
+    #if DCF
+        //unsigned long getDCFTime() {
+        //	time_t DCFtime = DCF.getTime();
+        //	// Indicator that a time check is done
+        //	if (DCFtime!=0) {
+        //		DEBUG_PRINT("sync");
+        //	}
+        //	return DCFtime;
+        //}
+     #endif
+    
 	switch(displayMode) {
 		case 0:              //ONOFF
 			off();
@@ -435,23 +435,8 @@ void loop() {
                         clockLogic();
 			break;
 	}
-#if DHT11
-                dhtRead();
-#endif
+
 }
-
-        #if DCF
-        //unsigned long getDCFTime() {
-        //	time_t DCFtime = DCF.getTime();
-        //	// Indicator that a time check is done
-        //	if (DCFtime!=0) {
-        //		DEBUG_PRINT("sync");
-        //	}
-        //	return DCFtime;
-        //}
-        #endif
-
-        
 
 //***********************DISPLAY MODES**********************
 
