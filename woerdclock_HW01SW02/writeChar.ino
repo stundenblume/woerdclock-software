@@ -1,24 +1,24 @@
 void writeChar(char val){
-  int writeLED = 0;
-  int l = 10;                                     //erste Spalte schreiben
+  boolean writeLED = 0;
+  byte l = 10;                                     //erste Spalte schreiben
   //DEBUG_PRINT("writeChar");
   //DEBUG_PRINT(val);
   
-  for(int k=0;k<10;k++){                          //verschieben des Buchstaben in den Zeilen
+  for(byte k=0;k<10;k++){                          //verschieben des Buchstaben in den Zeilen
  
             resetAndBlack();
-            for(int i=0;i<6;i++){                        //Zeile Buchstabe
-               for(int j=0;j<10;j++){                     //Spalte Buchstabe
+            for(byte i=0;i<6;i++){                        //Zeile Buchstabe
+               for(byte j=0;j<10;j++){                     //Spalte Buchstabe
                         switch (val){
-//                            case 'A':
-//                              writeLED = arrayA[i][j];
-//                              break;
+                            case 'A':
+                              writeLED = arrayA[i][j];
+                              break;
 //                            case 'B':
 //                              writeLED = arrayB[i][j];
 //                              break;
-//                            case 'C':
-//                              writeLED = arrayC[i][j];
-//                              break;
+                            case 'C':
+                              writeLED = arrayC[i][j];
+                              break;
 //                              case 'D':
 //                                writeLED = arrayD[k][j];
 //                                break;
@@ -31,9 +31,9 @@ void writeChar(char val){
 //                            case 'G':
 //                              writeLED = arrayG[i][j];
 //                              break;
-//                            case 'H':
-//                              writeLED = arrayH[i][j];
-//                              break;
+                            case 'H':
+                              writeLED = arrayH[i][j];
+                              break;
 //                            case 'I':
 //                              writeLED = arrayI[i][j];
 //                              break;
@@ -43,18 +43,18 @@ void writeChar(char val){
 //                            case 'K':
 //                              writeLED = arrayK[i][j];
 //                              break;
-//                            case 'L':
-//                              writeLED = arrayL[i][j];
-//                              break;
+                            case 'L':
+                              writeLED = arrayL[i][j];
+                              break;
 //                            case 'M':
 //                              writeLED = arrayM[i][j];
 //                              break;
 //                            case 'N':
 //                              writeLED = arrayN[i][j];
 //                              break;
-//                            case 'O':
-//                              writeLED = arrayO[i][j];
-//                              break;
+                            case 'O':
+                              writeLED = arrayO[i][j];
+                              break;
 //                            case 'P':
 //                              writeLED = arrayP[i][j];
 //                              break;
@@ -105,21 +105,21 @@ void writeChar(char val){
                             case '5':
                               writeLED = array5[i][j];
                               break;
-//                            case '6':
-//                              writeLED = array6[i][j];
-//                              break;
-//                            case '7':
-//                              writeLED = array7[i][j];
-//                              break;
-//                            case '8':
-//                              writeLED = array8[i][j];
-//                              break;
-//                            case '9':
-//                              writeLED = array9[i][j];
-//                              break;
-//                            case '0':
-//                              writeLED = array0[i][j];
-//                              break;     
+                            case '6':
+                              writeLED = array6[i][j];
+                              break;
+                            case '7':
+                              writeLED = array7[i][j];
+                              break;
+                            case '8':
+                              writeLED = array8[i][j];
+                              break;
+                            case '9':
+                              writeLED = array9[i][j];
+                              break;
+                            case '0':
+                              writeLED = array0[i][j];
+                              break;     
 //                            default:
 //                              pushToStrip(0);
 //                              pushToStrip(1);
@@ -135,10 +135,10 @@ void writeChar(char val){
                  }
             }   
           displayStrip(CRGB::Blue);
-          delay(1000);                                  //verzögerung für die Verschiebung
+          delay(100);                                  //verzögerung für die Verschiebung
           l--;                                 //Spalte in der Matrix nach links
     }
-    delay(1000);
+    delay(100);
 }
 
 

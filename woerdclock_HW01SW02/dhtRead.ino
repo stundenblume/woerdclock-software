@@ -4,7 +4,7 @@ void dhtRead(){
   
   if(millis() >= waitUntilDHT) {
     // Wait a few seconds between measurements.
-    if(DHT_TIMER >= 5000){
+    if(DHT_TIMER >= 500){
   
     // Reading temperature or humidity takes about 250 milliseconds!
     // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
@@ -16,7 +16,7 @@ void dhtRead(){
       // Check if any reads failed and exit early (to try again).
         if (isnan(humi) || isnan(temp)) {
           #ifdef DEBUG
-          Serial.println("Failed to read from DHT sensor!");
+          Serial.println(F("Failed to read from DHT sensor!"));
           #endif
           return;
         }
@@ -26,12 +26,12 @@ void dhtRead(){
 //  float hi = dht.computeHeatIndex(f, h);
 //  int dht11_temp =
     #ifdef DEBUG
-      Serial.print("Feuchte:");
+      Serial.print(F("Feuchte:"));
       Serial.print(humi);
-      Serial.println(" %");
-      Serial.print("Temperatur: "); 
+      Serial.println(F(" %"));
+      Serial.print(F("Temperatur: ")); 
       Serial.print(temp);
-      Serial.print(" *C ");
+      Serial.print(F(" *C "));
       Serial.println();
     #endif
   
@@ -40,18 +40,19 @@ void dhtRead(){
     //int check = 0;
     if (firstnumber > 0){
       writedht(firstnumber);
-      #ifdef DEBUG
-      Serial.print("firstdhttemp=");
-      Serial.print(firstnumber);
-      Serial.println(); 
-      #endif
+//      #ifdef DEBUG
+//      Serial.print("firstdhttemp=");
+//      Serial.print(firstnumber);
+//      Serial.println(); 
+//      #endif
     }
     writedht(secondnumber);
-    #ifdef DEBUG
-      Serial.print("seconddhttemp=");
-      Serial.print(secondnumber);
-      Serial.println(); 
-     #endif
+    writeChar('C');
+//    #ifdef DEBUG
+//      Serial.print("seconddhttemp=");
+//      Serial.print(secondnumber);
+//      Serial.println(); 
+//     #endif
   
     DHT_TIMER = 0;
     } 

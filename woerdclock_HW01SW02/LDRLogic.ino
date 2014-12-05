@@ -1,7 +1,7 @@
 #if LDR
 void doLDRLogic() {
 	if(millis() >= waitUntilLDR && autoBrightnessEnabled) {
-		DEBUG_PRINT("doing LDR logic");
+		DEBUG_PRINT(F("doing LDR logic"));
 		waitUntilLDR = millis();
 		int ldrVal = map(analogRead(ANALOGPIN), 0, 1023, 0, 180);
 		FastLED.setBrightness(ldrVal);
