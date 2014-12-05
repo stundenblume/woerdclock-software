@@ -3,28 +3,22 @@ Serial Communication Modul for Wördclock
 
 is a part of wördclock, a Arduino powered and WS2812B featured Wordclock.
 
-This is the Serial Communication Modul for Wördclock v0.5 by Marcel Müller.
+This is the Serial Communication Modul for Wördclock v0.71 by Marcel Müller.
 It based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz
 
 wc_serial_mode is the main programm.
-wc_serial_mode can use three functions:
+serial_com.ino includes the routine for serial communication.
 
-Serial1_interprete
-to interprete command from bluetooth (pin 0,1)
+At first you have to select the hardware that is connected via #define ... 1
+and select the hardware that you don't want to use via #define ... 0
+With this, you can save memory.
 
-Serial_interprete();
-to interprete commands from serial port (usb)
-
-BTSerial_interprete()
-to interprete commands from bluetooth (pin 9,8)
-
-The default BAUDRATE is 9600 for all functions.
-
-If comment a function out, you can use only the other ways.
-
-Actually, wifi is not implementet, comming soon.
-
-
+The default BAUDRATE is 9600 for all ports:
+Serial (=usb)
+Serial (=pin 0,1)
+BTSerial (=Software Serial)
+BTSerial2 (=Software Serial)
+Actually, wifi is not implementet, but comming soon.
 
 The communication works passive.
 Send a command and you get an answer.
@@ -45,19 +39,4 @@ You can check the color in EEPROM with glcp.
 
 You can do all the same with the led brightness.
 
-
-Implemented commands are
-  show = show status
-  help = help text
-  
-  slb = set_led_brightness (store in SRAM)
-  glb = get_led_brightness (get from SRAM)
-  
-  slbp = set_led_brightness_permanent (store in EEPROM)
-  glbp = get_led_brightness_permanent (get from EEPROM)
-  
-  slc = set_led_color (store in SRAM)
-  glc = get_led_color (get from SRAM)
-  
-  slcp = set_led_color_permanent (store in EEPROM)
-  glcp = get_led_color_permanent (get from EEPROM)
+With the command help, you get the full list.
