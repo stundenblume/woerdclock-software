@@ -3,7 +3,7 @@ Serial Communication Modul for Wördclock
 
 is a part of wördclock, a Arduino powered and WS2812B featured Wordclock.
 
-This is the Serial Communication Modul for Wördclock v0.71 by Marcel Müller.
+This is the Serial Communication Modul for Wördclock v0.72 by Marcel Müller.
 
 It based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz
 

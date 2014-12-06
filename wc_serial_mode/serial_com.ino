@@ -1,7 +1,32 @@
-void serial_com(void)
-{
+/* Serial Communication Modul for Wördclock v0.72 by Marcel Müller
+   Developed with Arduino IDE 1.5.7 on Arduino Pro Micro and Arduino Yun
+
+  This program comes with absolutely no warranty. Use at your own risk
+  
+  Jobs of this modul:
+    check if serial communication is available
+    [x] via usb
+    [x] via bluetooth
+      [x] hardware serial pin 0,1
+      [x] software serial
+    [-] via WiFi (not implemented)
+    if no communication is available, do something else in the loop
+    
+    if communication is available, this module seperate commands from parameters
+    interprete this and do something
+    
+  ToDo
+    select your connected hardware
+    verify the software serial pins
+    
+  Bug
+    actually, it is not possible to use two software serial ports at the same time
+*/
+
+#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
+
   /* Welcome + help text */
-  const char strwelcome[]  = "\nWelcome to WördClock Controller Interface  \n\r version 0.71";
+  const char strwelcome[]  = "\nWelcome to WördClock Controller Interface  \n\r version 0.72";
   const char strhelp1[] = 
   "\n Possible commands are:"
   "\n\r help           help text"
@@ -27,7 +52,12 @@ void serial_com(void)
   const char strerror[] = "error";
   const char paramseperator = ',';
   const char cmdbreak = '\n';
-  
+#endif
+
+
+/* Serial communication */
+void serial_com(void)
+{
   /* Check which port is actually available 
       This is realy primitive, because there is a ranking.
       If usb send permanent data, bluetooth will be ignored.
@@ -35,52 +65,64 @@ void serial_com(void)
   */
   serial_com_port = 255; //default, means no port
   
-  if(USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || WLAN)
-  {
   #if USBPORT0
-  if(Serial.available())
+  while(Serial.available()>0)
   {
     serial_com_port = 0;
+    serial_interprete();
   }
+  serial_com_port = 255;
   #endif
+  
   #if BLUETOOTH0
-  else if(Serial1.available())
+  while(Serial1.available()>0)
   {
     serial_com_port = 1;
+    serial_interprete();
   }
+  serial_com_port = 255;
   #endif
   
   #if WLAN
-  //  else if(wifi.available())
+  //  if(wifi.available())
   //  {
   //    serial_com_port = 4;
   //  }
   #endif
-  }
-  else
+  
+  #if BLUETOOTH1 && BLUETOOTH2
+  BTSerial.listen();
+  #endif
+  
+  #if BLUETOOTH1
+  while(BTSerial.available()>0)
   {
-    
-    #if BLUETOOTH1
-    BTSerial.listen();
-    if(BTSerial.available())
-    {
-      serial_com_port = 2;
-    }
-    #endif
-    
-    #if BLUETOOTH2
-    BTSerial2.listen();
-    if(BTSerial2.available())
-    {
-      serial_com_port = 3;
-    }
-    #endif
-    
+    serial_com_port = 2;
+    serial_interprete();
   }
+  serial_com_port = 255;
+  #endif
+
+  #if BLUETOOTH1 && BLUETOOTH2
+  BTSerial2.listen();
+  #endif
   
-  
-  /* Serial communication start */
-  /* based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz */
+  #if BLUETOOTH2
+  while(BTSerial2.available()>0)
+  {
+    serial_com_port = 3;
+    serial_interprete();
+  }
+  serial_com_port = 255;
+  #endif
+} 
+
+
+/* Interpreter */
+/* based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz */
+#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
+void serial_interprete()
+{
   int i,j,k;
   if(serial_com_port<4){                   // check to see if at least one character is available
     char ch=read_serial();
@@ -274,12 +316,13 @@ void serial_com(void)
   /* Serial communication end */
   }
 }
-
+#endif
 
 
 
 
 /* read a char from the serial interfaces */
+#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
 char read_serial()
 {
   char ch;
@@ -287,7 +330,7 @@ char read_serial()
   {
     #if USBPORT0
     case 0: // read from usb
-    if(Serial.available())
+    if(Serial.available()>0)
     {                   
       ch=Serial.read();
       return ch;
@@ -297,7 +340,7 @@ char read_serial()
     
     #if BLUETOOTH0
     case 1: // read from pin 0,1
-    if(Serial1.available())
+    if(Serial1.available()>0)
     {                   
       ch=Serial1.read();
       return ch;
@@ -307,7 +350,7 @@ char read_serial()
     
     #if BLUETOOTH1
     case 2: // read via bluetooth 1
-    if(BTSerial.available())
+    if(BTSerial.available()>0)
     {                   
       ch=BTSerial.read();
       return ch;
@@ -317,7 +360,7 @@ char read_serial()
 
     #if BLUETOOTH2   
     case 3: // read via bluetooth 2
-      if(BTSerial2.available())
+      if(BTSerial2.available()>0)
       {                   
         ch=BTSerial2.read();
         return ch;
@@ -332,9 +375,10 @@ char read_serial()
     #endif
   }
 }
-
+#endif
 
 /* write a number/value to the serial interfaces */
+#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
 void write_serial(int value)
 {
   switch(serial_com_port)
@@ -370,10 +414,10 @@ void write_serial(int value)
     #endif
   }
 }
-
+#endif
 
 /* write a char to the serial interfaces */
-
+#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
 void write_serial_str(char value)
 {
   switch(serial_com_port)
@@ -409,7 +453,7 @@ void write_serial_str(char value)
     #endif
   }
 }
-
+#endif
 
 /* 
   write the cmd to the serial port, e.g.: 
@@ -417,7 +461,11 @@ void write_serial_str(char value)
   than you get the answer:
   "led=0,0,0,..,0"
   the string "led=" is generated by this function to save memory
+  the first letter will be ignored: 
+   gled -> led=...
+   ghum -> hum=...
 */
+#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
 void write_serial_cmd(int j)
 {
   for(int i=1; i<sizeof(cmdStrCon[j])-1 ; i++)
@@ -429,3 +477,4 @@ void write_serial_cmd(int j)
   }
   write_serial_str('=');
 }
+#endif

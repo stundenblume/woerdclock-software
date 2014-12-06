@@ -1,38 +1,17 @@
-/* Serial Communication Modul for Wördclock v0.71 by Marcel Müller
-   Developed with Arduino IDE 1.5.7 on Arduino Pro Micro
-
-  !!! untested state !!!
-  This program comes with absolutely no warranty. Use at your own risk
-  
-  Jobs of this modul:
-    check if serial communication is available
-    [x] via usb, then use usb
-    [x] via bluetooth, then use bluetooth via
-      [x] hardware serial pin 0,1
-      [x] software serial
-    [-] via WiFi (not implemented)
-    if no communication is available, do something else in the loop
-    
-    if communication is available, this module seperate commands from parameters
-    interprete this and do something
-    
-  ToDo
-    select your connected hardware
-    verify the software serial pins
-*/
+/* for details see serial_com.ino */
 
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
 
 long BAUDRATE = 9600; // default Baudrate for serial communication
-byte serial_com_port = 0; // A number to seperate the ports for serial communication from each other
+byte serial_com_port = 255; // A number to seperate the ports for serial communication from each other
 boolean showvalues = false; // For debugging only
 
 
 /*** Which Modules are installed? ***/
 /* NEW */
 #define BLUETOOTH0 0 //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
-#define USBPORT0 0 // Serial Communication across usb
+#define USBPORT0 1 // Serial Communication across usb
 /* NEW */
 
 /* This block is copied from jan! -> remove this block while merge */
@@ -61,7 +40,7 @@ boolean showvalues = false; // For debugging only
 SoftwareSerial BTSerial(8, 9); // Connect Arduino Micro pin 9 with HC-06 pin RX and Arduino Micro pin 8 with HC-06 pin TX
 #endif
 #if BLUETOOTH2
-SoftwareSerial BTSerial2(14, 15); // Connect Arduino Micro pin 15 with HC-06 pin RX and Arduino Micro pin 14 with HC-06 pin TX
+SoftwareSerial BTSerial2(10, 11); // Connect Arduino Micro pin 15 with HC-06 pin RX and Arduino Micro pin 14 with HC-06 pin TX
 #endif
 
 
@@ -132,7 +111,8 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 
 void setup()
 {
-/* You need this in your setup for serial communication */
+  #if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
+  /* You need this in your setup for serial communication */
   for(int i=0; i++; i<paraCount)
   {
     cmd[i][0]='\0';
@@ -153,7 +133,8 @@ void setup()
   #if BLUETOOTH2
   BTSerial2.begin(BAUDRATE);    // initialize a second Software Serial port for bluetooth
   #endif 
-/* You need this in your setup  for serial communication */
+  /* You need this in your setup  for serial communication */
+  #endif
 }
 
 
