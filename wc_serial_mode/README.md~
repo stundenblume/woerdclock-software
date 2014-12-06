@@ -7,9 +7,9 @@ This is the Serial Communication Modul v0.72  by Marcel Müller for Wördclock.
 
 It based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz
 
-- wc_serial_mode is the main programm.
+wc_serial_mode is the main programm.
 
-- serial_com.ino includes the routine for serial communication.
+serial_com.ino includes the routine for serial communication.
 
 At first you have to select the hardware that is connected via #define ... 1 and select the hardware that you don't want to use via #define ... 0
 With this, you can save memory.
