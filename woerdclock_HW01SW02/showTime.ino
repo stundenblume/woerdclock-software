@@ -310,8 +310,8 @@ void pushZEHN() {
 
 void pushELF() {
 	pushToStrip(koordinate(0,7));
+	pushToStrip(koordinate(1,7));
 	pushToStrip(koordinate(2,7));
-	pushToStrip(koordinate(3,7));
 }
 
 void pushUHR() {

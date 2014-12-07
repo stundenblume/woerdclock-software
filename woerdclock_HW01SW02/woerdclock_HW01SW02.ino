@@ -105,7 +105,8 @@ const boolean arrayO [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,
  //const boolean arrayX [6][10] =  {{0,1,0,0,0,0,1,0,0,0},{0,0,1,0,1,0,0,0,0,0},{0,0,0,1,0,0,0,0,0,0},{0,0,1,0,1,0,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
  //const boolean arrayY [6][10] =  {{0,1,0,0,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,0,0,1,1,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,1,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};            
  //const boolean arrayZ [6][10] =  {{0,1,0,0,0,1,0,0,0,0},{0,1,1,0,0,1,0,0,0,0},{0,0,1,1,0,1,0,0,0,0},{0,1,0,0,1,1,0,0,0,0},{0,1,0,0,0,6,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};           
- //const boolean array_ [6][10] =  {{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};           
+ //const boolean array_ [6][10] =  {{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+const boolean arrayp [6][10] = {{0,0,1,1,0,0,1,0,0,0},{0,0,1,1,0,1,0,0,0,0},{0,0,0,0,1,0,0,0,0,0},{0,0,0,1,0,1,1,0,0,0},{0,0,1,0,0,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}}; 
 const boolean array1 [6][10] =  {{0,0,0,1,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,1,1,1,1,1,1,1,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};            
 const boolean array2 [6][10] =  {{0,0,1,0,0,0,1,1,0,0},{0,1,0,0,0,1,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,1,0,0,0,1,0,0},{0,0,1,0,0,0,0,1,0,0},{0,0,0,0,0,0,0,0,0,0}};             
 const boolean array3 [6][10] =  {{0,0,1,0,0,0,1,0,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
@@ -237,9 +238,9 @@ const boolean array0 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,0,0,0,1,0,0},{0,
 
 //****************************Default Config********************
 //Display Mode at start
-int displayMode = 4;        //Clock is default Modus
+int displayMode = 5;        //Clock with Color Change is default Modus
 //Default Color?
-CRGB defaultColor = CRGB::Red; //White, Red, Green, Blue, Yellow
+CRGB defaultColor = CRGB::Blue; //White, Red, Green, Blue, Yellow
 uint8_t colorIndex = 0;
 boolean autoBrightnessEnabled = true;
 byte brightness = 50;
@@ -256,6 +257,8 @@ long waitUntilDCF = 0;
 long waitUntilLDR = 0;
 long waitUntilwriteChar = 0;
 long waitUntilDHT = 0;
+const long dhtDelay = 30000;     //delay for show temp and humidity
+boolean dhtaktion = false;       //dht in aktion marker
 
 //****************************Debug Config**********************
 #ifdef DEBUG
@@ -417,7 +420,7 @@ void loop() {
         //	return DCFtime;
         //}
      #endif
-    
+    //Select Displaymode
 	switch(displayMode) {
 		case 0:              //ONOFF
 			off();
@@ -434,15 +437,17 @@ void loop() {
 		case 4:                //CLOCK
 			clockLogic();
 			break;
+                case 5:                
+			clockLogiColor(); //CLOCK with Color Change
+			break;
 		default:
-                        clockLogic();
+                        clockLogiColor();
 			break;
 	}
 
 }
 
-//***********************DISPLAY MODES**********************
-
+//***********************DISPLAY MODES OFF**********************
 void off() {
 	if(millis() >= waitUntilOff) {
 		DEBUG_PRINT("switching off");
@@ -452,38 +457,22 @@ void off() {
 		waitUntilOff += halfSecondDelay;
 	}
 }
-
-void fastTest() {
-	if(millis() >= waitUntilFastTest) {
-		autoBrightnessEnabled = false;
-		DEBUG_PRINT("fastTest");
-		waitUntilFastTest = millis();
-		if(testMinutes >= 60) {
-			testMinutes = 0;
-			testHours++;
-		}
-		if(testHours >= 24) {
-			testHours = 0;
-		}
-		
-		//Array leeren
-		resetAndBlack();
-		timeToStrip(testHours, testMinutes);
-		displayStripRandomColor();
-		testMinutes++;
-		waitUntilFastTest += oneSecondDelay;
-	}
-}
 //*************************Led Function**********************
 CRGB prevColor() {
 	if(colorIndex > 0) {
 		colorIndex--;
+	}
+        if(colorIndex == 0) {
+		colorIndex = 9;
 	}
 	return getColorForIndex();
 }
 CRGB nextColor() {
 	if(colorIndex < 9) {
 		colorIndex++;
+	}
+         if(colorIndex == 9) {
+		colorIndex = 0;
 	}
 	return getColorForIndex();
 }
@@ -512,7 +501,7 @@ CRGB getColorForIndex() {
 			return CRGB::Silver;
 		default:
 			colorIndex = 0;
-			return CRGB::Red;
+			return CRGB::Blue;
 	}
 }
 

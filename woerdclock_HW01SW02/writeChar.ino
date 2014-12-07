@@ -90,6 +90,9 @@ void writeChar(char val){
 //                              break;
 //                            case ' ':         
 //                              break;
+                            case 'p':         
+                              writeLED = arrayp[i][j];
+                              break;
                             case '1':
                               writeLED = array1[i][j];
                               break;
@@ -134,11 +137,11 @@ void writeChar(char val){
                   i=6;
                  }
             }   
-          displayStrip(CRGB::Blue);
+          displayStrip(defaultColor);
           delay(100);                                  //verzögerung für die Verschiebung
           l--;                                 //Spalte in der Matrix nach links
     }
-    delay(100);
+    //delay(100);
 }
 
 
