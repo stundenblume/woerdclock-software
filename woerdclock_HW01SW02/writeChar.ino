@@ -1,3 +1,5 @@
+#if DHT11
+
 void writeChar(char val){
   boolean writeLED = 0;
   byte l = 10;                                     //erste Spalte schreiben
@@ -144,5 +146,5 @@ void writeChar(char val){
     //delay(100);
 }
 
-
+#endif
 
