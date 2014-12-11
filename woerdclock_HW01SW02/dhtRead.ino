@@ -28,7 +28,8 @@ void dhtRead(){
         Serial.print(F(" *C "));
         Serial.println();
       #endif
-  
+  //make text
+  #if TEXT
     int firstnumber = temp/10;      //first Number of temp
     int secondnumber = temp%10;     //second Number of temp
     //int check = 0;
@@ -46,9 +47,12 @@ void dhtRead(){
     writeChar('p');                 //show %
     dhtaktion = true;
     waitUntilDHT = millis();
-    waitUntilDHT += dhtDelay; 
+    waitUntilDHT += dhtDelay;
+   #endif 
   } 
 }
+#endif
+#if TEXT
 //funkction to show the right Number
 void writedht(int check){            
 
@@ -63,5 +67,4 @@ void writedht(int check){
         else if (check==8) writeChar('8');
         else if (check==9) writeChar('9'); 
 }
-
 #endif

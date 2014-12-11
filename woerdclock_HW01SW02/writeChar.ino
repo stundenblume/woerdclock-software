@@ -1,4 +1,4 @@
-#if DHT11
+#if TEXT
 
 void writeChar(char val){
   boolean writeLED = 0;

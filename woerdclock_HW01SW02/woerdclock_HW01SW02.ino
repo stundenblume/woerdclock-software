@@ -51,6 +51,7 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define IR 0         //Module IR
 #define DHT11 1      //Module DHT11
 #define RFM12 0      //Module RMF12B
+#define TEXT 0        //Show Text
 
 //Debug Mode or not (uncommand)
 #define DEBUG 1
@@ -192,6 +193,9 @@ CRGB leds[NUM_LEDS];
 long waitUntilwriteChar = 0;
 long waitUntilDHT = 0;
 const long dhtDelay = 30000;     //delay for show temp and humidity  
+#endif
+
+#if TEXT
 
   //arrays for the char  
 const boolean arrayA [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};

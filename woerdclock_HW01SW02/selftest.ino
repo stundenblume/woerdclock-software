@@ -15,11 +15,13 @@ void selftest(int pause){
     // Turn our current led back to black for the next loop around
     leds[whiteLed] = CRGB::Black;
   }
+    #if TEXT
      writeChar('H');
      writeChar('A');
      writeChar('L');
      writeChar('L');
      writeChar('O');
+    #endif
 }
 
 void fastTest() {
