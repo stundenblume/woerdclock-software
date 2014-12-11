@@ -9,7 +9,8 @@ void clockLogic() {
 		  	testHours = now.hour();
 			resetAndBlack();
 			timeToStrip(testHours, testMinutes);
-			displayStrip(defaultColor);
+			//displayStrip(defaultColor);
+                        displayStrip(LEDcolorR, LEDcolorG, LEDcolorB);
 		}
 		waitUntilRtc += oneSecondDelay;
 	}
@@ -29,6 +30,7 @@ void clockLogiColor() {
 			resetAndBlack();
 			timeToStrip(testHours, testMinutes);
 			displayStrip(defaultColor);
+
 		}
 		waitUntilRtc += oneSecondDelay;
 	}

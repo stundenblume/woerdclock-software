@@ -40,8 +40,11 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 //Which Modules are installed?
 #define RTCLOCK 1     //Module Real Time Clock
 #define BUTTON 1     //Button are used
-#define LDR 1        //LDR is used
-#define BLUETOOTH1 0 //Module Bluetooth 1
+#define LDR 0        //LDR is used
+#define GENSERIAL 1     //Gen Serial
+#define BLUETOOTH0 0 //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
+#define USBPORT0 1   // Serial Communication across usb
+#define BLUETOOTH1 1 //Module Bluetooth 1
 #define BLUETOOTH2 0 //Module Bluetooth 2
 #define WLAN 0       //Module WLAN
 #define DOF 0        //Module 10DOF
@@ -53,6 +56,8 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define RFM12 0      //Module RMF12B
 #define TEXT 0        //Show Text
 
+
+
 //Debug Mode or not (uncommand)
 #define DEBUG 1
 //****************************LED Config************************
@@ -60,9 +65,10 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #include <FastLED.h>
 #include <Wire.h>
 #include <avr/pgmspace.h>
+#include <EEPROM.h>
 //LED defines
 #define NUM_LEDS 114
-  
+long BAUDRATE = 9600; // default Baudrate for serial communication
  
 //PIN defines
 #define STRIP_DATA_PIN 21
@@ -74,7 +80,7 @@ uint8_t stackptr = 0;
 CRGB leds[NUM_LEDS];
    
 //****************************RTC Config Library************************
-#if RTCLOCK  
+#if RTCLOCK
   #include "RTClib.h"
   RTC_DS1307 RTC;
  //RTC variables
@@ -92,7 +98,7 @@ CRGB leds[NUM_LEDS];
 #endif
 //****************************Button Config**********************
 #if BUTTON
-  #include <EEPROM.h>
+  
   #define ANALOGPIN A1              //Analogpin for Button and LDR
   //Button variables
   #define CHARSHOWTIME 600
@@ -106,13 +112,72 @@ CRGB leds[NUM_LEDS];
 #if LDR
   long waitUntilLDR = 0;
 #endif
+//****************************Serial Config******************
+#if GENSERIAL
+ #include <SoftwareSerial.h>
+ byte serial_com_port = 255; // A number to seperate the ports for serial communication from each other
+ boolean showvalues = false; // For debugging only
+ boolean LED[NUM_LEDS] = {0};// this is a dummy array for the LEDs of wordclock 0=off, 1=on
+ long timestamp = 0;  // this is a dummy variable for the date and time in unix time stamp format (see http://playground.arduino.cc/Code/Time )
+ 
+ /* Start command definitions for serial communication - don't touch this 
+    based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz */
+/*
+  paraCount defines the maximum number of command and parameters
+  paraLength defines the maximum length for commands and parameters (paraLength = max command/parameter length +1)
+  cmdCount defines the number of entities
+  cmdStrCon defines the commands in lower case!!
+*/
+const byte  paraCount = 4;                            // max quantity of parameter (incl. command) per line    slc = r,g,b
+const byte  paraLength = 5;                           // max length per parameter/command (-1)                 help,show
+const byte  cmdCount = 16;                            // quantity of possible commands                        show to slcp
+const char cmdStrCon[cmdCount][paraLength]=
+{
+  {
+    "show"  }
+  ,{
+    "help"  }
+  ,{
+    "slb"  }
+  ,{
+    "glb"  }
+  ,{
+    "slbp"  }
+  ,{
+    "glbp"  }
+  ,{
+    "slc"  }
+  ,{
+    "glc"  }
+  ,{
+    "slcp"  }
+  ,{
+    "glcp"  }
+  ,{
+    "sled" }
+  ,{
+    "gled" }
+  ,{
+    "srtc" }
+  ,{
+    "gtem" }
+  ,{
+    "ghum"}
+  ,{
+    "mode"}
+};
+char       cmdStr[paraCount*paraLength+paraCount+1]; //buffer for complete line of comand and parameter
+int        cmdStrIn=0;                               //index for the cmdStr 
+char       cmd[paraCount][paraLength];               //arry with command and parameters
+/* End command definitons for serial communication - don't touch this */
+#endif
 //****************************Bluetooth1 Config******************
 #if BLUETOOTH1
-
+ SoftwareSerial BTSerial(8, 9); // Connect Arduino Micro pin 9 with HC-06 pin RX and Arduino Micro pin 8 with HC-06 pin TX
 #endif
 //****************************Bluetooth2 Config******************
 #if BLUETOOTH2
-
+  SoftwareSerial BTSerial2(10, 11); // Connect Arduino Micro pin 15 with HC-06 pin RX and Arduino Micro pin 14 with HC-06 pin TX
 #endif
 //****************************WLAN Config************************
 #if WLAN
@@ -249,9 +314,13 @@ const boolean array0 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,0,0,0,1,0,0},{0,
 
 //****************************Default Config********************
 //Display Mode at start
-int displayMode = 5;        //Clock with Color Change is default Modus
+int displayMode = 4;        //Clock with Color Change is default Modus
 //Default Color?
 CRGB defaultColor = CRGB::Blue; //White, Red, Green, Blue, Yellow
+byte LEDbright = EEPROM.read(4); // this is a dummy variable for the LED brightness
+byte LEDcolorR = EEPROM.read(5); // this is a dummy variable for the LED color red
+byte LEDcolorG = EEPROM.read(6); // this is a dummy variable for the LED color green
+byte LEDcolorB = EEPROM.read(7); // this is a dummy variable for the LED color blue
 uint8_t colorIndex = 0;
 boolean autoBrightnessEnabled = true;
 byte brightness = 50;
@@ -279,7 +348,7 @@ boolean dhtaktion = false;       //dht in aktion marker
 void setup() {
 	
 	#ifdef DEBUG
-		Serial.begin(9600);
+		Serial.begin(BAUDRATE);
 	#endif
 	
 	
@@ -364,18 +433,32 @@ void setup() {
     #if IR	
       irrecv.enableIRIn();
     #endif
-//***************setup Bluetooth1**********************    
-    #if BLUETOOTH1
+//***************setup Bluetooth WLAN ********************** 
+#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
+  /* You need this in your setup for serial communication */
+  for(int i=0; i++; i<paraCount)
+  {
+    cmd[i][0]='\0';
+  }
+  
+  #if USBPORT0
+  Serial.begin(BAUDRATE);       // initialize serial port for usb
+  #endif
+  
+  #if BLUETOOTH0
+  Serial1.begin(BAUDRATE);      // initialize serial port for bluetooth
+  #endif
+  
+  #if BLUETOOTH1
+  BTSerial.begin(BAUDRATE);     // initialize Software Serial port for bluetooth
+  #endif
+  
+  #if BLUETOOTH2
+  BTSerial2.begin(BAUDRATE);    // initialize a second Software Serial port for bluetooth
+  #endif 
+  /* You need this in your setup  for serial communication */
+#endif
 
-    #endif 
-//***************setup Bluetooth2**********************
-    #if BLUETOOTH2
-
-    #endif
-//***************setup WLAN*****************************
-    #if WLAN
-
-    #endif
 //***************setup SD*******************************
     #if SDCARD
 
@@ -413,6 +496,12 @@ void loop() {
     
     #if DHT11
         dhtRead();
+    #endif
+    
+    /* All in one serial communication function to interprete command from any serial port*/
+    //#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
+    #if SERIAL
+    serial_com();
     #endif
     
     //ram_info();
@@ -545,6 +634,13 @@ void displayStrip() {
 void displayStrip(CRGB colorCode) {
 	for(int i = 0; i<stackptr; i++) {
 		leds[strip[i]] = colorCode;
+	}
+	FastLED.show();
+}
+
+void displayStrip(byte red, byte green, byte blue) {
+	for(int i = 0; i<stackptr; i++) {
+		leds[strip[i]] = CRGB( red, green, blue);
 	}
 	FastLED.show();
 }
