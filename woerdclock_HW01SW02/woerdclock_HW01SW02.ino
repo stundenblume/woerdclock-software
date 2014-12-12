@@ -25,13 +25,26 @@ Siehe die GNU General Public License f�r weitere Details.
 
 Sie sollten eine Kopie der GNU General Public License zusammen mit diesem
 Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>. 
+
+Menue mod:
+no jumper is set; after the selftest the button must be push (start with 1-3), ever Button is show with the minute LED;
+after all button are calibrate the value of the button are show as a bitvalue;
+next step is time adjust with the buttons 1 and 2 (h and m); After a short time the LEDs go off
+the jumper is set and the default mode start (normally Clockmod)
+
+Chance mod:
+no jumper is set; push the ok button; with the h- and m-button chance the mod the LED show the mod; do nothing and after 5s chance mod exit   
+
 */
 
 //Which Modules are installed?
 #define RTCLOCK 1     //Module Real Time Clock
 #define BUTTON 1     //Button are used
-#define LDR 1        //LDR is used
-#define BLUETOOTH1 0 //Module Bluetooth 1
+#define LDR 0        //LDR is used
+#define GENSERIAL 1     //Gen Serial
+#define BLUETOOTH0 0 //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
+#define USBPORT0 1   // Serial Communication across usb
+#define BLUETOOTH1 1 //Module Bluetooth 1
 #define BLUETOOTH2 0 //Module Bluetooth 2
 #define WLAN 0       //Module WLAN
 #define DOF 0        //Module 10DOF
@@ -39,8 +52,11 @@ Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
 #define SDCARD 0     //Module SD Card
 #define MIC 0        //Module Microfon
 #define IR 0         //Module IR
-#define DHT11 0      //Module DHT11
+#define DHT11 1      //Module DHT11
 #define RFM12 0      //Module RMF12B
+#define TEXT 0        //Show Text
+
+
 
 //Debug Mode or not (uncommand)
 #define DEBUG 1
@@ -48,15 +64,11 @@ Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
 //Library includes
 #include <FastLED.h>
 #include <Wire.h>
+#include <avr/pgmspace.h>
+#include <EEPROM.h>
 //LED defines
 #define NUM_LEDS 114
-
-//Modus variables
-  #define ONOFF 0
-  #define FAST  1
-  #define DISCO 2
-  #define ANIM  3
-  #define CLOCK 4
+long BAUDRATE = 9600; // default Baudrate for serial communication
  
 //PIN defines
 #define STRIP_DATA_PIN 21
@@ -66,48 +78,15 @@ Programm erhalten haben. Wenn nicht, siehe <http://www.gnu.org/licenses/>.
 uint8_t strip[NUM_LEDS];
 uint8_t stackptr = 0;
 CRGB leds[NUM_LEDS];
-   int arrayA [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayB [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayC [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayD [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayE [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayF [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayK [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,0,1,0,0,0,0,0,0},{0,0,1,0,1,0,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayL [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayM [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,1,0,0,0,0,0,0,0,0},{0,1,1,1,1,1,0,0,0,0}};
-   int arrayN [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,0,0,1,0,0,0,0,0,0},{0,1,1,1,1,1,0,0,0,0}};
-   int arrayO [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayP [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,1,1,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayQ [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0}};
-   int arrayR [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,1,0,0,0,0,0},{0,1,1,1,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};          
-   int arrayS [][10] =  {{0,1,1,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};             
-   int arrayT [][10] =  {{0,1,0,0,0,0,0,0,0,0},{0,1,1,1,1,0,0,0,0,0},{0,1,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayU [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-   int arrayV [][10] =  {{0,1,1,0,0,0,0,0,0,0},{0,0,1,1,0,0,0,0,0,0},{0,0,0,0,1,1,0,0,0,0},{0,0,0,1,1,0,0,0,0,0},{0,1,1,0,0,0,0,0,0,0}};
-   int arrayW [][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0}};
-   int arrayX [][10] =  {{0,1,0,0,0,0,1,0,0,0},{0,0,1,0,1,0,0,0,0,0},{0,0,0,1,0,0,0,0,0,0},{0,0,1,0,1,0,0,0,0,0},{0,1,0,0,0,1,0,0,0,0}};
-   int arrayY [][10] =  {{0,1,0,0,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,0,0,1,1,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,1,0,0,0,0,0,0,0,0}};            
-   int arrayZ [][10] =  {{0,1,0,0,0,1,0,0,0,0},{0,1,1,0,0,1,0,0,0,0},{0,0,1,1,0,1,0,0,0,0},{0,1,0,0,1,1,0,0,0,0},{0,1,0,0,0,6,0,0,0,0}};           
-   int array_ [][10] =  {{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};           
-   int array1 [][10] =  {{0,0,0,1,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,1,1,1,1,1,1,1,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};            
-   int array2 [][10] =  {{0,0,1,0,0,0,1,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,1,1,0,1,0,0},{0,1,0,1,0,0,0,1,0,0},{0,0,1,0,0,0,0,1,0,0}};             
-   int array3 [][10] =  {{0,0,1,0,0,0,1,0,0,0},{0,1,0,0,0,0,1,0,0,0},{0,1,0,0,1,1,1,0,0,0},{0,1,0,1,0,0,1,0,0,0},{0,0,1,0,0,0,1,0,0,0}};
-   int array4 [][10] =  {{0,1,1,1,1,0,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,1,1,1,1,1,0,0},{0,0,0,0,1,0,0,0,0,0},{0,0,0,0,1,0,0,0,0,0}};             
-   int array5 [][10] =  {{0,1,1,0,0,0,7,0,0,0},{0,1,0,1,0,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,0,1,0,1,0,0},{0,0,1,0,0,0,1,1,0,0}};           
-   int array6 [][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,0,0,1,1,0,0,0}};             
-   int array7 [][10] =  {{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,1,1,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,1,0,0,0,0,0},{0,1,1,1,0,0,0,0,0,0}};             
-   int array8 [][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0}};        
-   int array9 [][10] =  {{0,0,1,1,0,0,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0}};            
-   int array0 [][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0}};
    
 //****************************RTC Config Library************************
-#if RTCLOCK  
+#if RTCLOCK
   #include "RTClib.h"
   RTC_DS1307 RTC;
  //RTC variables
   boolean RTCpresent=false;
   unsigned long lastSecond;
-  byte h=4, m=4, s=4;
+  byte ye=0, mo=0, da=0, h=4, m=4, s=4;
   //Clock variables
   uint8_t selectedLanguageMode = 0;
   const uint8_t RHEIN_RUHR_MODE = 0; //Define?
@@ -115,30 +94,90 @@ CRGB leds[NUM_LEDS];
   //Auto Brightness On or Off
   int testHours = 0;
   int testMinutes = 0;
+  long waitUntilRtc = 0;
 #endif
 //****************************Button Config**********************
 #if BUTTON
-  #include <EEPROM.h>
+  
   #define ANALOGPIN A1              //Analogpin for Button and LDR
   //Button variables
   #define CHARSHOWTIME 600
   #define AUTOENDTIME 5000
   #define TIMEEXTENSION 10000
   #define TOLLERANCE 10
-  boolean menue=false,debugmod=true;
+  boolean menue=false,debugmod=true, modus=false;
   int hButtonValue=1,mButtonValue=2,okButtonValue=4;
 #endif
 //****************************LDR Config************************
 #if LDR
-  #define ANALOGPIN 0              //Analogpin for Button and LDR
+  long waitUntilLDR = 0;
+#endif
+//****************************Serial Config******************
+#if GENSERIAL
+ #include <SoftwareSerial.h>
+ byte serial_com_port = 255; // A number to seperate the ports for serial communication from each other
+ boolean showvalues = false; // For debugging only
+ boolean LED[NUM_LEDS] = {0};// this is a dummy array for the LEDs of wordclock 0=off, 1=on
+ long timestamp = 0;  // this is a dummy variable for the date and time in unix time stamp format (see http://playground.arduino.cc/Code/Time )
+ 
+ /* Start command definitions for serial communication - don't touch this 
+    based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz */
+/*
+  paraCount defines the maximum number of command and parameters
+  paraLength defines the maximum length for commands and parameters (paraLength = max command/parameter length +1)
+  cmdCount defines the number of entities
+  cmdStrCon defines the commands in lower case!!
+*/
+const byte  paraCount = 4;                            // max quantity of parameter (incl. command) per line    slc = r,g,b
+const byte  paraLength = 5;                           // max length per parameter/command (-1)                 help,show
+const byte  cmdCount = 16;                            // quantity of possible commands                        show to slcp
+const char cmdStrCon[cmdCount][paraLength]=
+{
+  {
+    "show"  }
+  ,{
+    "help"  }
+  ,{
+    "slb"  }
+  ,{
+    "glb"  }
+  ,{
+    "slbp"  }
+  ,{
+    "glbp"  }
+  ,{
+    "slc"  }
+  ,{
+    "glc"  }
+  ,{
+    "slcp"  }
+  ,{
+    "glcp"  }
+  ,{
+    "sled" }
+  ,{
+    "gled" }
+  ,{
+    "srtc" }
+  ,{
+    "gtem" }
+  ,{
+    "ghum"}
+  ,{
+    "mode"}
+};
+char       cmdStr[paraCount*paraLength+paraCount+1]; //buffer for complete line of comand and parameter
+int        cmdStrIn=0;                               //index for the cmdStr 
+char       cmd[paraCount][paraLength];               //arry with command and parameters
+/* End command definitons for serial communication - don't touch this */
 #endif
 //****************************Bluetooth1 Config******************
 #if BLUETOOTH1
-
+ SoftwareSerial BTSerial(8, 9); // Connect Arduino Micro pin 9 with HC-06 pin RX and Arduino Micro pin 8 with HC-06 pin TX
 #endif
 //****************************Bluetooth2 Config******************
 #if BLUETOOTH2
-
+  SoftwareSerial BTSerial2(10, 11); // Connect Arduino Micro pin 15 with HC-06 pin RX and Arduino Micro pin 14 with HC-06 pin TX
 #endif
 //****************************WLAN Config************************
 #if WLAN
@@ -160,6 +199,7 @@ CRGB leds[NUM_LEDS];
   //time_t time;
   //DCF77 DCF = DCF77(DCF_PIN,DCF_INTERRUPT);
   //bool timeInSync = false;
+  long waitUntilDCF = 0;
 #endif
 //****************************SD Config*************************
 #if SDCARD
@@ -171,8 +211,15 @@ CRGB leds[NUM_LEDS];
 #endif
 //****************************IR Config*************************
 #if IR
-  #include <IRremote.h>
+  //#include <IRremote.h>
   // IR defines
+  ////Modus variables
+  #define ONOFF 0
+  #define FAST  1
+  #define DISCO 2
+  #define ANIM  3
+  #define CLOCK 4
+  
   //#define ONOFF 0xFF02FD
   #define AUTO 0xFFF00F
   #define BLUE_DOWN 0xFF48B7
@@ -202,8 +249,58 @@ CRGB leds[NUM_LEDS];
   #define DHTTYPE DHT11 
   DHT dht(DHTPIN, DHTTYPE);
 
-  float humi = 0;
-  float temp = 0;
+  int humi = 0;
+  int temp = 0;
+  
+//  int temperatur = 22;
+  int DHT_TIMER = 0;
+ 
+long waitUntilwriteChar = 0;
+long waitUntilDHT = 0;
+const long dhtDelay = 30000;     //delay for show temp and humidity  
+#endif
+
+#if TEXT
+
+  //arrays for the char  
+const boolean arrayA [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayB [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+const boolean arrayC [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayD [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayE [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayF [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayG [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+const boolean arrayH [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,0,1,0,0,0,0,0,0},{0,0,0,1,0,0,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayI [6][10] =  {{0,0,0,0,0,0,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayJ [6][10] =  {{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayK [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,0,1,0,0,0,0,0,0},{0,0,1,0,1,0,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+const boolean arrayL [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayM [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,1,0,0,0,0,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayN [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,0,0,1,0,0,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+const boolean arrayO [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayP [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,1,1,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayQ [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayR [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,1,0,1,0,0,0,0,0,0},{0,1,0,1,1,0,0,0,0,0},{0,1,1,1,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};          
+ //const boolean arrayS [6][10] =  {{0,1,1,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,0,1,0,0,0,0},{0,1,0,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};             
+ //const boolean arrayT [6][10] =  {{0,1,0,0,0,0,0,0,0,0},{0,1,1,1,1,0,0,0,0,0},{0,1,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayU [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayV [6][10] =  {{0,1,1,0,0,0,0,0,0,0},{0,0,1,1,0,0,0,0,0,0},{0,0,0,0,1,1,0,0,0,0},{0,0,0,1,1,0,0,0,0,0},{0,1,1,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayW [6][10] =  {{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,1,1,1,1,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayX [6][10] =  {{0,1,0,0,0,0,1,0,0,0},{0,0,1,0,1,0,0,0,0,0},{0,0,0,1,0,0,0,0,0,0},{0,0,1,0,1,0,0,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+ //const boolean arrayY [6][10] =  {{0,1,0,0,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,0,0,1,1,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,1,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};            
+ //const boolean arrayZ [6][10] =  {{0,1,0,0,0,1,0,0,0,0},{0,1,1,0,0,1,0,0,0,0},{0,0,1,1,0,1,0,0,0,0},{0,1,0,0,1,1,0,0,0,0},{0,1,0,0,0,6,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};           
+ //const boolean array_ [6][10] =  {{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+const boolean arrayp [6][10] = {{0,0,1,1,0,0,1,0,0,0},{0,0,1,1,0,1,0,0,0,0},{0,0,0,0,1,0,0,0,0,0},{0,0,0,1,0,1,1,0,0,0},{0,0,1,0,0,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}}; 
+const boolean array1 [6][10] =  {{0,0,0,1,0,0,0,0,0,0},{0,0,1,0,0,0,0,0,0,0},{0,1,1,1,1,1,1,1,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};            
+const boolean array2 [6][10] =  {{0,0,1,0,0,0,1,1,0,0},{0,1,0,0,0,1,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,1,0,0,0,1,0,0},{0,0,1,0,0,0,0,1,0,0},{0,0,0,0,0,0,0,0,0,0}};             
+const boolean array3 [6][10] =  {{0,0,1,0,0,0,1,0,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
+const boolean array4 [6][10] =  {{0,1,1,1,1,0,0,0,0,0},{0,0,0,0,0,1,0,0,0,0},{0,0,0,1,1,1,1,1,0,0},{0,0,0,0,1,0,0,0,0,0},{0,0,0,0,1,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};             
+const boolean array5 [6][10] =  {{0,1,1,0,0,0,7,0,0,0},{0,1,0,1,0,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,0,1,0,1,0,0},{0,0,1,0,0,0,1,1,0,0},{0,0,0,0,0,0,0,0,0,0}};           
+const boolean array6 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,0,0,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};             
+const boolean array7 [6][10] =  {{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,1,1,0,0,0},{0,1,0,0,0,1,0,0,0,0},{0,1,0,0,1,0,0,0,0,0},{0,1,1,1,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0,0}};             
+const boolean array8 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};        
+const boolean array9 [6][10] =  {{0,0,1,1,0,0,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};            
+const boolean array0 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
   
 #endif
 //****************************RFM12 Config**********************
@@ -217,24 +314,27 @@ CRGB leds[NUM_LEDS];
 
 //****************************Default Config********************
 //Display Mode at start
-int displayMode = 4;        //Clock is default Modus
+int displayMode = 4;        //Clock with Color Change is default Modus
 //Default Color?
-CRGB defaultColor = CRGB::Red; //White, Red, Green, Blue, Yellow
+CRGB defaultColor = CRGB::Blue; //White, Red, Green, Blue, Yellow
+byte LEDbright = EEPROM.read(4); // this is a dummy variable for the LED brightness
+byte LEDcolorR = EEPROM.read(5); // this is a dummy variable for the LED color red
+byte LEDcolorG = EEPROM.read(6); // this is a dummy variable for the LED color green
+byte LEDcolorB = EEPROM.read(7); // this is a dummy variable for the LED color blue
 uint8_t colorIndex = 0;
 boolean autoBrightnessEnabled = true;
-int brightness = 50;
+byte brightness = 50;
 
 //multitasking helper
 const long oneSecondDelay = 1000;
 const long halfSecondDelay = 500;
-long waitUntilRtc = 0;
+
 long waitUntilParty = 0;
 long waitUntilOff = 0;
 long waitUntilFastTest = 0;
 long waitUntilHeart = 0;
-long waitUntilDCF = 0;
-long waitUntilLDR = 0;
-long waitUntilwriteChar = 0;
+
+boolean dhtaktion = false;       //dht in aktion marker
 
 //****************************Debug Config**********************
 #ifdef DEBUG
@@ -248,7 +348,7 @@ long waitUntilwriteChar = 0;
 void setup() {
 	
 	#ifdef DEBUG
-		Serial.begin(9600);
+		Serial.begin(BAUDRATE);
 	#endif
 	
 	
@@ -263,43 +363,6 @@ void setup() {
 	displayStrip();
 
 //***************Setup RTC***************************
-     #if BUTTON
-        if(analogRead(ANALOGPIN)<10) menue = true;
-
-        selftest(100); // test all LEDs
-
-        if (RTC.isrunning()) {
-          DateTime now = RTC.now();
-            }
-        else{
-            writeChar('N');
-            writeChar('O');
-            writeChar(' ');
-            writeChar('R');
-            writeChar('T');
-            writeChar('C');
-        } // Check if RTC is present
-
-
-        if (menue && analogRead(ANALOGPIN)>10) {
-          debugmod=true;
-          menue=false;
-          writeChar('D');
-          writeChar('E');
-          writeChar('B');
-          writeChar('U');
-          writeChar('G');
-        }
-        if (!menue && !debugmod){
-          writeChar('H');
-          writeChar('I');
-        }
-     
-        boolean calibOK = alreadyCalibrated(); // Check if there is was already a calibration of the buttons 
-        if (!calibOK || menue) buttonCalibration(); // if there wasn't already a calibration OR jumper is open, do the calibration
-        if (menue && calibOK) adjustTime(); // if the jumper ist open AND the there is al calibration for the buttonValus, go to adjust the time
-     #endif
-//***************Setup RTC***************************
     #if RTCLOCK        
         DateTime now = RTC.now();
         Wire.begin();
@@ -307,6 +370,9 @@ void setup() {
         if (RTC.isrunning()) {
           RTCpresent = true;
           DateTime now = RTC.now();
+          ye=now.year();
+          mo=now.month();
+          da=now.day();
           h=now.hour();
           m=now.minute();
           s=now.second();     
@@ -314,8 +380,41 @@ void setup() {
         else{
         // following line sets the RTC to the date & time this sketch was compiled
         RTC.adjust(DateTime(__DATE__, __TIME__));
+        DEBUG_PRINT("No RTC");
+        resetAndBlack();
+	pushToStrip(0);
+        pushToStrip(3);
+        displayStrip(CRGB::Red);
         }	
     #endif
+//***************Setup BUTTON***************************
+     #if BUTTON
+        if(analogRead(ANALOGPIN)<10) menue = true;        //Menue start with Jumper
+     #if DHT11   
+        selftest(100); // test all LEDs and write "HALLO"                  
+     #endif
+        if (menue && analogRead(ANALOGPIN)>10) {          //Debug start with Jumper set after selftest, nothing to debug!
+          debugmod=true;
+          menue=false;
+          resetAndBlack();
+	  pushToStrip(1);
+          pushToStrip(2);
+          displayStrip(CRGB::Blue);
+          
+        }
+        if (!menue && !debugmod){                        //No debug no menue, normal start
+            resetAndBlack();
+	    pushToStrip(3);
+            pushToStrip(1);
+            displayStrip(CRGB::Green);
+
+        }
+     
+        boolean calibOK = alreadyCalibrated();           // Check if there is was already a calibration of the buttons 
+        if (!calibOK || menue) buttonCalibration();      // if there wasn't already a calibration OR jumper is open, do the calibration
+        if (menue && calibOK) adjustTime(); // if the jumper ist open AND the there is al calibration for the buttonValus, go to adjust the time
+     #endif
+
 
 //***************setup DCF*****************************
     #if DCF
@@ -334,18 +433,32 @@ void setup() {
     #if IR	
       irrecv.enableIRIn();
     #endif
-//***************setup Bluetooth1**********************    
-    #if BLUETOOTH1
+//***************setup Bluetooth WLAN ********************** 
+#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
+  /* You need this in your setup for serial communication */
+  for(int i=0; i++; i<paraCount)
+  {
+    cmd[i][0]='\0';
+  }
+  
+  #if USBPORT0
+  Serial.begin(BAUDRATE);       // initialize serial port for usb
+  #endif
+  
+  #if BLUETOOTH0
+  Serial1.begin(BAUDRATE);      // initialize serial port for bluetooth
+  #endif
+  
+  #if BLUETOOTH1
+  BTSerial.begin(BAUDRATE);     // initialize Software Serial port for bluetooth
+  #endif
+  
+  #if BLUETOOTH2
+  BTSerial2.begin(BAUDRATE);    // initialize a second Software Serial port for bluetooth
+  #endif 
+  /* You need this in your setup  for serial communication */
+#endif
 
-    #endif 
-//***************setup Bluetooth2**********************
-    #if BLUETOOTH2
-
-    #endif
-//***************setup WLAN*****************************
-    #if WLAN
-
-    #endif
 //***************setup SD*******************************
     #if SDCARD
 
@@ -381,6 +494,29 @@ void loop() {
         selectModus();
     #endif
     
+    #if DHT11
+        dhtRead();
+    #endif
+    
+    /* All in one serial communication function to interprete command from any serial port*/
+    //#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
+    #if SERIAL
+    serial_com();
+    #endif
+    
+    //ram_info();
+    
+    #if DCF
+        //unsigned long getDCFTime() {
+        //	time_t DCFtime = DCF.getTime();
+        //	// Indicator that a time check is done
+        //	if (DCFtime!=0) {
+        //		DEBUG_PRINT("sync");
+        //	}
+        //	return DCFtime;
+        //}
+     #endif
+    //Select Displaymode
 	switch(displayMode) {
 		case 0:              //ONOFF
 			off();
@@ -397,25 +533,17 @@ void loop() {
 		case 4:                //CLOCK
 			clockLogic();
 			break;
+                case 5:                
+			clockLogiColor(); //CLOCK with Color Change
+			break;
 		default:
-                        clockLogic();
+                        clockLogiColor();
 			break;
 	}
+
 }
 
-#if DCF
-//unsigned long getDCFTime() {
-//	time_t DCFtime = DCF.getTime();
-//	// Indicator that a time check is done
-//	if (DCFtime!=0) {
-//		DEBUG_PRINT("sync");
-//	}
-//	return DCFtime;
-//}
-#endif
-
-//***********************DISPLAY MODES**********************
-
+//***********************DISPLAY MODES OFF**********************
 void off() {
 	if(millis() >= waitUntilOff) {
 		DEBUG_PRINT("switching off");
@@ -425,38 +553,22 @@ void off() {
 		waitUntilOff += halfSecondDelay;
 	}
 }
-
-void fastTest() {
-	if(millis() >= waitUntilFastTest) {
-		autoBrightnessEnabled = false;
-		DEBUG_PRINT("fastTest");
-		waitUntilFastTest = millis();
-		if(testMinutes >= 60) {
-			testMinutes = 0;
-			testHours++;
-		}
-		if(testHours >= 24) {
-			testHours = 0;
-		}
-		
-		//Array leeren
-		resetAndBlack();
-		timeToStrip(testHours, testMinutes);
-		displayStripRandomColor();
-		testMinutes++;
-		waitUntilFastTest += oneSecondDelay;
-	}
-}
 //*************************Led Function**********************
 CRGB prevColor() {
 	if(colorIndex > 0) {
 		colorIndex--;
+	}
+        if(colorIndex == 0) {
+		colorIndex = 9;
 	}
 	return getColorForIndex();
 }
 CRGB nextColor() {
 	if(colorIndex < 9) {
 		colorIndex++;
+	}
+         if(colorIndex == 9) {
+		colorIndex = 0;
 	}
 	return getColorForIndex();
 }
@@ -485,7 +597,7 @@ CRGB getColorForIndex() {
 			return CRGB::Silver;
 		default:
 			colorIndex = 0;
-			return CRGB::Red;
+			return CRGB::Blue;
 	}
 }
 
@@ -522,6 +634,13 @@ void displayStrip() {
 void displayStrip(CRGB colorCode) {
 	for(int i = 0; i<stackptr; i++) {
 		leds[strip[i]] = colorCode;
+	}
+	FastLED.show();
+}
+
+void displayStrip(byte red, byte green, byte blue) {
+	for(int i = 0; i<stackptr; i++) {
+		leds[strip[i]] = CRGB( red, green, blue);
 	}
 	FastLED.show();
 }
