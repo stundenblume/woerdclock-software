@@ -56,7 +56,7 @@
 
 
 /* Serial communication */
-#if GENSERIAL
+#if SERIAL
 void serial_com(void)
 {
   /* Check which port is actually available 

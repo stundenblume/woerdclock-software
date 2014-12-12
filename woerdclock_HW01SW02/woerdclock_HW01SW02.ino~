@@ -500,7 +500,7 @@ void loop() {
     
     /* All in one serial communication function to interprete command from any serial port*/
     //#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
-    #if GENSERIAL
+    #if SERIAL
     serial_com();
     #endif
     
