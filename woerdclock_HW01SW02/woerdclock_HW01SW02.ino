@@ -51,8 +51,8 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define DCF 0        //Module DCF77
 #define SDCARD 0     //Module SD Card
 #define MIC 0        //Module Microfon
-#define IR 0         //Module IR
-#define DHT11 1      //Module DHT11
+#define IRRESV 0         //Module IR
+#define DHT11 0      //Module DHT11
 #define RFM12 0      //Module RMF12B
 #define TEXT 0        //Show Text
 
@@ -210,38 +210,38 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 
 #endif
 //****************************IR Config*************************
-#if IR
-  #include <IRremote.h>
-  // IR defines
-  ////Modus variables
-  #define ONOFF 0
-  #define FAST  1
-  #define DISCO 2
-  #define ANIM  3
-  #define CLOCK 4
-  
-  //#define ONOFF 0xFF02FD
-  #define AUTO 0xFFF00F
-  #define BLUE_DOWN 0xFF48B7
-  #define BLUE_UP 0xFF6897
-  #define BRIGHTER 0xFF3AC5
-  #define DIM 0xFFBA45
-  #define DIY1 0xFF30CF
-  #define DIY2 0xFFB04F
-  #define DIY3 0xFF708F
-  #define DIY4 0xFF10EF
-  #define DIY5 0xFF906F
-  #define DIY6 0xFF50AF
-  #define FLASH 0xFFD02F
-  #define QUICK 0xFFE817
-  #define SLOW 0xFFC837
-  
-  #define IR_RECV_PIN 6
-  
-  //IR variables
-  IRrecv irrecv = IRrecv(IR_RECV_PIN);
-  decode_results irDecodeResults;
-#endif
+//#if IRRESV
+//  #include <IRremote.h>
+//  // IR defines
+//  ////Modus variables
+//  #define ONOFF 0
+//  #define FAST  1
+//  #define DISCO 2
+//  #define ANIM  3
+//  #define CLOCK 4
+//  
+//  //#define ONOFF 0xFF02FD
+//  #define AUTO 0xFFF00F
+//  #define BLUE_DOWN 0xFF48B7
+//  #define BLUE_UP 0xFF6897
+//  #define BRIGHTER 0xFF3AC5
+//  #define DIM 0xFFBA45
+//  #define DIY1 0xFF30CF
+//  #define DIY2 0xFFB04F
+//  #define DIY3 0xFF708F
+//  #define DIY4 0xFF10EF
+//  #define DIY5 0xFF906F
+//  #define DIY6 0xFF50AF
+//  #define FLASH 0xFFD02F
+//  #define QUICK 0xFFE817
+//  #define SLOW 0xFFC837
+//  
+//  #define IR_RECV_PIN 6
+//  
+//  //IR variables
+//  IRrecv irrecv = IRrecv(IR_RECV_PIN);
+//  decode_results irDecodeResults;
+//#endif
 //****************************DHT11 Config**********************
 #if DHT11
   #include "DHT.h"
@@ -430,9 +430,9 @@ void setup() {
 //	}
     #endif
 //***************setup ir******************************
-    #if IR	
-      irrecv.enableIRIn();
-    #endif
+//    #if IRRESV	
+//      irrecv.enableIRIn();
+//    #endif
 //***************setup Bluetooth WLAN ********************** 
 #if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
   /* You need this in your setup for serial communication */
@@ -482,9 +482,9 @@ void setup() {
 }
 
 void loop() {
-    #if IR	
-        doIRLogic();
-    #endif
+//    #if IRRESV	
+//        doIRLogic();
+//    #endif
 
     #if LDR	
         doLDRLogic();
@@ -500,7 +500,7 @@ void loop() {
     
     /* All in one serial communication function to interprete command from any serial port*/
     //#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
-    #if SERIAL
+    #if GENSERIAL
     serial_com();
     #endif
     

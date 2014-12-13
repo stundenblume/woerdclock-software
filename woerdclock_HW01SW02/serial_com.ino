@@ -56,7 +56,7 @@
 
 
 /* Serial communication */
-#if SERIAL
+#if GENSERIAL
 void serial_com(void)
 {
   /* Check which port is actually available 
@@ -210,12 +210,12 @@ void serial_interprete()
         break;
 
       case  4: //slbp = set_led_brightness_permanent (store in EEPROM)
-	EEPROM.write(0, LEDbright);
+	EEPROM.write(4, LEDbright);
       break;
 
       case  5: //glbp = get_led_brightness_permanent (get from EEPROM)
         write_serial_cmd(j);
-        write_serial(EEPROM.read(0));
+        write_serial(EEPROM.read(4));
         write_serial_str(cmdbreak);
       break;
 
@@ -239,18 +239,18 @@ void serial_interprete()
       break;
 
       case  8: //slcp = set_led_color_permanent (store in EEPROM)
-        EEPROM.write(1, LEDcolorR);
-        EEPROM.write(2, LEDcolorG);
-        EEPROM.write(3, LEDcolorB);
+        EEPROM.write(5, LEDcolorR);
+        EEPROM.write(6, LEDcolorG);
+        EEPROM.write(7, LEDcolorB);
       break;
 
       case 9: //glcp = get_led_color_permanent (get from EEPROM)
         write_serial_cmd(j);
-        write_serial(EEPROM.read(1));
+        write_serial(EEPROM.read(5));
         write_serial_str(paramseperator);
-        write_serial(EEPROM.read(2));
+        write_serial(EEPROM.read(6));
         write_serial_str(paramseperator);
-        write_serial(EEPROM.read(3));
+        write_serial(EEPROM.read(7));
         write_serial_str(cmdbreak);
       break;
 
