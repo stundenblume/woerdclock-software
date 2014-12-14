@@ -49,6 +49,37 @@ void dhtRead(){
     waitUntilDHT = millis();
     waitUntilDHT += dhtDelay;
    #endif 
+   
+   #if TEXT2
+    int firstnumber = temp/10;      //first Number of temp
+    int secondnumber = temp%10;     //second Number of temp
+    resetAndBlack();                //black
+    if (firstnumber > 0){           //first Number needed?
+      startrow = 0;                 //start row
+      writedht(firstnumber);        //show first Number
+    }
+    startrow = 6;                   //start row
+    writedht(secondnumber);         //show second Number
+    
+    displayStrip(LEDcolorR, LEDcolorG, LEDcolorB);
+    delay(3000);
+    
+    firstnumber = humi/10;          //first Number of humidity
+    secondnumber = humi%10;         //second Number of humidity
+    resetAndBlack();                //black
+    if (firstnumber > 0){           //first Number needed?
+      startrow = 0;                 //start row
+      writedht(firstnumber);
+    } 
+    startrow = 6;                   //start row
+    writedht(secondnumber);         //show second Number
+    displayStrip(LEDcolorR, LEDcolorG, LEDcolorB);
+    delay(3000);
+    
+    dhtaktion = true;
+    waitUntilDHT = millis();
+    waitUntilDHT += dhtDelay;
+   #endif 
   } 
 }
 #endif
@@ -68,3 +99,92 @@ void writedht(int check){
         else if (check==9) writeChar('9'); 
 }
 #endif
+
+#if TEXT2
+//funkction to show the right Number
+void writedht(int check){            
+   byte mask = B00010000; 
+        if (check==0) {
+         for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array0[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        }
+        else if (check==1){ 
+          for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array1[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        }  
+        else if (check==2){
+          for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array2[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        }
+        else if (check==3){
+          for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array3[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        } 
+        else if (check==4){
+          for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array4[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        } 
+        else if (check==5){
+          for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array5[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        } 
+        else if (check==6){
+          for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array6[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        } 
+        else if (check==7){
+          for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array7[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        } 
+        else if (check==8){
+          for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array8[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        } 
+        else if (check==9){ 
+          for (char i=0;i<5;i++){      //cals
+           for (char j=0;j<5;j++){    //rows
+             if (array9[i] << j & mask)
+               pushToStrip(koordinate(startrow+j,i)); 
+           }
+         }
+        }
+}
+#endif
+
+

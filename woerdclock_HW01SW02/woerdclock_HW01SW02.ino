@@ -55,8 +55,8 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define IRRESV 0         //Module IR
 #define DHT11 1        //Module DHT11
 #define RFM12 0        //Module RMF12B
-#define TEXT 0        //Show Text
-
+#define TEXT 0        //Show Massage Board 
+#define TEXT2 1        //Show Text
 
 
 //Debug Mode or not (uncommand)
@@ -89,9 +89,9 @@ CRGB leds[NUM_LEDS];
   unsigned long lastSecond;
   byte ye=0, mo=0, da=0, h=4, m=4, s=4;
   //Clock variables
-  uint8_t selectedLanguageMode = 0;
-  const uint8_t RHEIN_RUHR_MODE = 0; //Define?
-  const uint8_t WESSI_MODE = 1;
+//  uint8_t selectedLanguageMode = 0;
+//  const uint8_t RHEIN_RUHR_MODE = 0; //Define?
+//  const uint8_t WESSI_MODE = 1;
   //Auto Brightness On or Off
   int testHours = 0;
   int testMinutes = 0;
@@ -315,7 +315,82 @@ const boolean array7 [6][10] =  {{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,1,1,0,0,0},{0,
 const boolean array8 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};        
 const boolean array9 [6][10] =  {{0,0,1,1,0,0,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};            
 const boolean array0 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-  
+#endif
+//**************************************************************
+#if TEXT2
+byte startrow = 0;
+
+const char array1 [5] =  {
+B00000100,
+B00000100,
+B00000100,
+B00000100,
+B00000100
+};
+const char array2 [5] =  {
+B00001111,
+B00000001,
+B00001111,
+B00001000,
+B00001111
+};             
+const char array3 [5] =  {
+B00001111,
+B00000001,
+B00000111,
+B00000001,
+B00001111
+};
+const char array4 [5] =  {
+B00001000,
+B00001010,
+B00001111,
+B00000010,
+B00000010
+};             
+const char array5 [5] =  {
+B00001111,
+B00001000,
+B00001111,
+B00000001,
+B00001111
+};           
+const char array6 [5] =  {
+B00001111,
+B00001000,
+B00001111,
+B00001001,
+B00001111
+};             
+const char array7 [5] =  {
+B00001111,
+B00000001,
+B00000001,
+B00000001,
+B00000001
+};             
+const char array8 [5] =  {
+B00001111,
+B00001001,
+B00001111,
+B00001001,
+B00001111
+};        
+const char array9 [5] =  {
+B00001111,
+B00001001,
+B00001111,
+B00000001,
+B00001111
+};            
+const char array0 [5] =  {
+B00001111,
+B00001001,
+B00001001,
+B00001001,
+B00001111
+};
+
 #endif
 //****************************RFM12 Config**********************
 #if RFM12

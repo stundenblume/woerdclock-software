@@ -14,14 +14,14 @@ void timeToStrip(uint8_t hours,uint8_t minutes)
 		pushVIERTEL();
 		pushNACH();
 	} else if(minutes >= 20 && minutes < 25) {
-		if(selectedLanguageMode == RHEIN_RUHR_MODE) {
+		//if(selectedLanguageMode == RHEIN_RUHR_MODE) {
 			pushZWANZIG();
 			pushNACH();
-		} else if(selectedLanguageMode == WESSI_MODE) {
-			pushZEHN1();
-			pushVOR();
-			pushHALB();
-		}
+		//} else if(selectedLanguageMode == WESSI_MODE) {
+//			pushZEHN1();
+//			pushVOR();
+//			pushHALB();
+		//}
 	} else if(minutes >= 25 && minutes < 30) {
 		pushFUENF1();
 		pushVOR();
@@ -33,14 +33,14 @@ void timeToStrip(uint8_t hours,uint8_t minutes)
 		pushNACH();
 		pushHALB();
 	} else if(minutes >= 40 && minutes < 45) {
-		if(selectedLanguageMode == RHEIN_RUHR_MODE) {
+		//if(selectedLanguageMode == RHEIN_RUHR_MODE) {
 			pushZWANZIG();
 			pushVOR();
-		} else if(selectedLanguageMode == WESSI_MODE) {
-			pushZEHN1();
-			pushNACH();
-			pushHALB();
-		}
+		//} else if(selectedLanguageMode == WESSI_MODE) {
+//			pushZEHN1();
+//			pushNACH();
+//			pushHALB();
+//		}
 	} else if(minutes >= 45 && minutes < 50) {
 		pushVIERTEL();
 		pushVOR();
@@ -79,15 +79,15 @@ void timeToStrip(uint8_t hours,uint8_t minutes)
 		hours -= 12;
 	}
 
-	if(selectedLanguageMode == RHEIN_RUHR_MODE) {
+	//if(selectedLanguageMode == RHEIN_RUHR_MODE) {
 		if(minutes >= 25) {
 			hours++;
 		}
-	} else if(selectedLanguageMode == WESSI_MODE) {
-		if(minutes >= 20) {
-			hours++;
-		}
-	}
+//	} else if(selectedLanguageMode == WESSI_MODE) {
+//		if(minutes >= 20) {
+//			hours++;
+//		}
+//	}
 
 	if(hours == 12) {
 		hours = 0;
