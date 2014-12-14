@@ -38,22 +38,23 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 */
 
 //Which Modules are installed?
+#define CONFIGBUTTON 0 //Config Buttons and adjust Time, SET CONFIGBUTTON or BUTTON 
 #define RTCLOCK 1     //Module Real Time Clock
-#define BUTTON 1     //Button are used
-#define LDR 0        //LDR is used
-#define GENSERIAL 1     //Gen Serial
-#define BLUETOOTH0 0 //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
-#define USBPORT0 1   // Serial Communication across usb
-#define BLUETOOTH1 1 //Module Bluetooth 1
-#define BLUETOOTH2 0 //Module Bluetooth 2
-#define WLAN 0       //Module WLAN
-#define DOF 0        //Module 10DOF
-#define DCF 0        //Module DCF77
-#define SDCARD 0     //Module SD Card
-#define MIC 0        //Module Microfon
+#define BUTTON 1      //Button are used  SET CONFIGBUTTON or BUTTON 
+#define LDR 0         //LDR is used
+#define GENSERIAL 0    //Gen Serial
+#define BLUETOOTH0 0   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
+#define USBPORT0 0     // Serial Communication across usb
+#define BLUETOOTH1 0   //Module Bluetooth 1
+#define BLUETOOTH2 0   //Module Bluetooth 2
+#define WLAN 0         //Module WLAN
+#define DOF 0          //Module 10DOF
+#define DCF 0          //Module DCF77
+#define SDCARD 0       //Module SD Card
+#define MIC 0          //Module Microfon
 #define IRRESV 0         //Module IR
-#define DHT11 0      //Module DHT11
-#define RFM12 0      //Module RMF12B
+#define DHT11 0        //Module DHT11
+#define RFM12 0        //Module RMF12B
 #define TEXT 0        //Show Text
 
 
@@ -96,16 +97,29 @@ CRGB leds[NUM_LEDS];
   int testMinutes = 0;
   long waitUntilRtc = 0;
 #endif
+
 //****************************Button Config**********************
-#if BUTTON
+#if CONFIGBUTTON
   
-  #define ANALOGPIN A1              //Analogpin for Button and LDR
+  #define ANALOGPIN A1 
   //Button variables
   #define CHARSHOWTIME 600
   #define AUTOENDTIME 5000
   #define TIMEEXTENSION 10000
   #define TOLLERANCE 10
+  
   boolean menue=false,debugmod=true, modus=false;
+  int hButtonValue=1,mButtonValue=2,okButtonValue=4;
+#endif
+
+//****************************Button ****************************
+#if BUTTON
+  
+  #define ANALOGPIN A1              //Analogpin for Button and LDR
+  //Button variables
+  #define AUTOENDTIME 5000
+  #define TOLLERANCE 10
+  boolean modus=false;
   int hButtonValue=1,mButtonValue=2,okButtonValue=4;
 #endif
 //****************************LDR Config************************
@@ -387,12 +401,12 @@ void setup() {
         displayStrip(CRGB::Red);
         }	
     #endif
-//***************Setup BUTTON***************************
-     #if BUTTON
+//***************Setup BUTTON CONFIG***************************
+     #if CONFIGBUTTON
         if(analogRead(ANALOGPIN)<10) menue = true;        //Menue start with Jumper
-     #if DHT11   
+      
         selftest(100); // test all LEDs and write "HALLO"                  
-     #endif
+     
         if (menue && analogRead(ANALOGPIN)>10) {          //Debug start with Jumper set after selftest, nothing to debug!
           debugmod=true;
           menue=false;
@@ -415,6 +429,14 @@ void setup() {
         if (menue && calibOK) adjustTime(); // if the jumper ist open AND the there is al calibration for the buttonValus, go to adjust the time
      #endif
 
+//***************Setup BUTTON***************************
+     #if BUTTON     
+        selftest(100);                                   // test all LEDs and write "HALLO" 
+        boolean calibOK = alreadyCalibrated();           // Check if there is was already a calibration of the buttons         
+        if (!calibOK){
+        DEBUG_PRINT(F("Button not calibrated"));
+        }
+     #endif
 
 //***************setup DCF*****************************
     #if DCF
