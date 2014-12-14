@@ -30,7 +30,7 @@
   const char strhelp1[] = 
   "\n Possible commands are:"
   "\n\r help           help text"
-  "\n\r slb=0-255 	set led brightness 0-255"
+  "\n\r slb=0-255       set led brightness 0-255"
   "\n\r glb            get led brightness"
   "\n\r slbp           store led brightness permanent"
   "\n\r glbp           get permanent led brightness"

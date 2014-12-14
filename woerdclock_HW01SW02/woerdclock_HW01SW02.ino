@@ -41,11 +41,11 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define CONFIGBUTTON 0 //Config Buttons and adjust Time, SET CONFIGBUTTON or BUTTON 
 #define RTCLOCK 1     //Module Real Time Clock
 #define BUTTON 1      //Button are used  SET CONFIGBUTTON or BUTTON 
-#define LDR 0         //LDR is used
-#define GENSERIAL 0    //Gen Serial
+#define LDR 1         //LDR is used
+#define GENSERIAL 1    //Gen Serial
 #define BLUETOOTH0 0   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
-#define USBPORT0 0     // Serial Communication across usb
-#define BLUETOOTH1 0   //Module Bluetooth 1
+#define USBPORT0 1     // Serial Communication across usb
+#define BLUETOOTH1 1   //Module Bluetooth 1
 #define BLUETOOTH2 0   //Module Bluetooth 2
 #define WLAN 0         //Module WLAN
 #define DOF 0          //Module 10DOF
@@ -53,7 +53,7 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define SDCARD 0       //Module SD Card
 #define MIC 0          //Module Microfon
 #define IRRESV 0         //Module IR
-#define DHT11 0        //Module DHT11
+#define DHT11 1        //Module DHT11
 #define RFM12 0        //Module RMF12B
 #define TEXT 0        //Show Text
 
@@ -72,7 +72,7 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 long BAUDRATE = 9600; // default Baudrate for serial communication
  
 //PIN defines
-#define STRIP_DATA_PIN 21
+#define STRIP_DATA_PIN 8
 //#define ARDUINO_LED 5           //Default Arduino LED
 
 //LED varables
@@ -101,7 +101,7 @@ CRGB leds[NUM_LEDS];
 //****************************Button Config**********************
 #if CONFIGBUTTON
   
-  #define ANALOGPIN A1 
+  #define ANALOGPIN A6 
   //Button variables
   #define CHARSHOWTIME 600
   #define AUTOENDTIME 5000
@@ -115,7 +115,7 @@ CRGB leds[NUM_LEDS];
 //****************************Button ****************************
 #if BUTTON
   
-  #define ANALOGPIN A1              //Analogpin for Button and LDR
+  #define ANALOGPIN A6              //Analogpin for Button and LDR
   //Button variables
   #define AUTOENDTIME 5000
   #define TOLLERANCE 10
@@ -187,11 +187,11 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 #endif
 //****************************Bluetooth1 Config******************
 #if BLUETOOTH1
- SoftwareSerial BTSerial(8, 9); // Connect Arduino Micro pin 9 with HC-06 pin RX and Arduino Micro pin 8 with HC-06 pin TX
+ SoftwareSerial BTSerial(18, 19); // Connect Arduino Micro pin 19 with HC-06 pin RX and Arduino Micro pin 18 with HC-06 pin TX
 #endif
 //****************************Bluetooth2 Config******************
 #if BLUETOOTH2
-  SoftwareSerial BTSerial2(10, 11); // Connect Arduino Micro pin 15 with HC-06 pin RX and Arduino Micro pin 14 with HC-06 pin TX
+  SoftwareSerial BTSerial2(20, 21); // Connect Arduino Micro pin 20 with HC-06 pin RX and Arduino Micro pin 21 with HC-06 pin TX
 #endif
 //****************************WLAN Config************************
 #if WLAN
@@ -259,7 +259,7 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 //****************************DHT11 Config**********************
 #if DHT11
   #include "DHT.h"
-  #define DHTPIN 8   
+  #define DHTPIN 6   
   #define DHTTYPE DHT11 
   DHT dht(DHTPIN, DHTTYPE);
 
