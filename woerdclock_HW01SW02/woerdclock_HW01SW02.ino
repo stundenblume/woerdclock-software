@@ -184,6 +184,37 @@ char       cmdStr[paraCount*paraLength+paraCount+1]; //buffer for complete line 
 int        cmdStrIn=0;                               //index for the cmdStr 
 char       cmd[paraCount][paraLength];               //arry with command and parameters
 /* End command definitons for serial communication - don't touch this */
+
+  #if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
+  
+    /* Welcome + help text */
+    const char strwelcome[]  = "\nWelcome to WördClock Controller Interface  \n\r version 0.72";
+    const char strhelp1[] = 
+    "\n Possible commands are:"
+    "\n\r help           help text"
+    "\n\r slb=0-255       set led brightness 0-255"
+    "\n\r glb            get led brightness"
+    "\n\r slbp           store led brightness permanent"
+    "\n\r glbp           get permanent led brightness"
+    "\n\r slc=R,G,B      set led color (R,G,B) (0-255)"
+    "\n\r glc            get led color";
+    
+    const char strhelp2[] =
+    "\n\r slcp           store led color permanent"
+    "\n\r glcp           get permanent led color"
+    "\n\r sled=0-114,0/1 set led by number off/on"
+    "\n\r srtc           set unix time stamp for clock"
+    "\n\r grtc           get unix time stamp and time from clock";
+  
+    const char strhelp3[] =
+    "\n\r gtem           get temperature"
+    "\n\r ghum           get humidity"
+    "\n\r mode           set the mode\n";
+  
+    const char strerror[] = "error";
+    const char paramseperator = ',';
+    const char cmdbreak = '\n';
+  #endif
 #endif
 //****************************Bluetooth1 Config******************
 #if BLUETOOTH1
