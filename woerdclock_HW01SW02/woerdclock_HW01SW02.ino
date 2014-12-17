@@ -73,43 +73,38 @@ long BAUDRATE = 9600; // default Baudrate for serial communication
  
 //PIN defines
 #define STRIP_DATA_PIN 8
-//#define ARDUINO_LED 5           //Default Arduino LED
 
 //LED varables
-uint8_t strip[NUM_LEDS];
-uint8_t stackptr = 0;
-CRGB leds[NUM_LEDS];
+uint8_t strip[NUM_LEDS];    //Array for the aktiv LEDs
+uint8_t stackptr = 0;       //Variable for the next LED to set
+CRGB leds[NUM_LEDS];        //LED Array for FASTLED
    
-//****************************RTC Config Library************************
+//***************************RTC Config Library************************
 #if RTCLOCK
-  #include "RTClib.h"
-  RTC_DS1307 RTC;
+  #include "RTClib.h"    //Lib for RTC
+  RTC_DS1307 RTC;        //TYP of RTC
  //RTC variables
-  boolean RTCpresent=false;
-  unsigned long lastSecond;
-  byte ye=0, mo=0, da=0, h=4, m=4, s=4;
+  //boolean RTCpresent=false;
+  //unsigned long lastSecond;
+  byte ye=0, mo=0, da=0, h=4, m=4, s=4; //Variables to adjust the RTC
   //Clock variables
-//  uint8_t selectedLanguageMode = 0;
-//  const uint8_t RHEIN_RUHR_MODE = 0; //Define?
-//  const uint8_t WESSI_MODE = 1;
-  //Auto Brightness On or Off
-  int testHours = 0;
+  int testHours = 0;        //Variables change time? minute or hour?
   int testMinutes = 0;
-  long waitUntilRtc = 0;
+  long waitUntilRtc = 0;    //Variable Delay for RTC 
 #endif
 
 //****************************Button Config**********************
 #if CONFIGBUTTON
   
-  #define ANALOGPIN A6 
+  #define ANALOGPIN A6         //Analogpin for Button and LDR
   //Button variables
-  #define CHARSHOWTIME 600
-  #define AUTOENDTIME 5000
-  #define TIMEEXTENSION 10000
-  #define TOLLERANCE 10
+  //#define CHARSHOWTIME 600     //
+  #define AUTOENDTIME 5000       //Time for Funktion 
+  #define TIMEEXTENSION 10000    //Time for Funktion ButtonCali 
+  #define TOLLERANCE 10          //Tollerance for the ButtonsValue
   
-  boolean menue=false,debugmod=true, modus=false;
-  int hButtonValue=1,mButtonValue=2,okButtonValue=4;
+  boolean menue=false,debugmod=true, modus=false;    //Modi for the Config
+  int hButtonValue=1,mButtonValue=2,okButtonValue=4; //Variable for the ButtonValue
 #endif
 
 //****************************Button ****************************
@@ -117,14 +112,14 @@ CRGB leds[NUM_LEDS];
   
   #define ANALOGPIN A6              //Analogpin for Button and LDR
   //Button variables
-  #define AUTOENDTIME 5000
-  #define TOLLERANCE 10
-  boolean modus=false;
-  int hButtonValue=1,mButtonValue=2,okButtonValue=4;
+  #define AUTOENDTIME 5000          //Time for Funktion
+  #define TOLLERANCE 10             //Tollerance for the ButtonsValue
+  boolean modus=false;              //Modi for the Config
+  int hButtonValue=1,mButtonValue=2,okButtonValue=4;//Variable for the ButtonValue
 #endif
 //****************************LDR Config************************
 #if LDR
-  long waitUntilLDR = 0;
+  long waitUntilLDR = 0;            // for LDR
 #endif
 //****************************Serial Config******************
 #if GENSERIAL
@@ -133,7 +128,7 @@ CRGB leds[NUM_LEDS];
  boolean showvalues = false; // For debugging only
  boolean LED[NUM_LEDS] = {0};// this is a dummy array for the LEDs of wordclock 0=off, 1=on
  long timestamp = 0;  // this is a dummy variable for the date and time in unix time stamp format (see http://playground.arduino.cc/Code/Time )
- 
+ long timestampold = 0;//this is variable for the old dummy
  /* Start command definitions for serial communication - don't touch this 
     based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz */
 /*
@@ -503,7 +498,7 @@ void setup() {
         Wire.begin();
         RTC.begin();
         if (RTC.isrunning()) {
-          RTCpresent = true;
+          //RTCpresent = true;
           DateTime now = RTC.now();
           ye=now.year();
           mo=now.month();
@@ -625,9 +620,9 @@ void setup() {
 }
 
 void loop() {
-//    #if IRRESV	
-//        doIRLogic();
-//    #endif
+    #if IRRESV	
+        doIRLogic();
+    #endif
 
     #if LDR	
         doLDRLogic();
@@ -642,9 +637,12 @@ void loop() {
     #endif
     
     /* All in one serial communication function to interprete command from any serial port*/
-    //#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
     #if GENSERIAL
     serial_com();
+    if (timestamp!=timestampold){
+    timestampold = timestamp;
+    RTC.adjust(DateTime(timestamp));  
+    }
     #endif
     
     //ram_info();

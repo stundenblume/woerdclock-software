@@ -12,7 +12,7 @@ void disco() {
 
                 soundbracelet();
 		//waitUntilParty += halfSecondDelay;
-	}
+	//}
 }
 #endif
 
