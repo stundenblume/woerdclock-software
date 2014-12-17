@@ -43,15 +43,15 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define BUTTON 1      //Button are used  SET CONFIGBUTTON or BUTTON 
 #define LDR 1         //LDR is used
 #define GENSERIAL 1    //Gen Serial
-#define BLUETOOTH0 0   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
+#define BLUETOOTH0 1   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
 #define USBPORT0 1     // Serial Communication across usb
-#define BLUETOOTH1 1   //Module Bluetooth 1
+#define BLUETOOTH1 0   //Module Bluetooth 1
 #define BLUETOOTH2 0   //Module Bluetooth 2
 #define WLAN 0         //Module WLAN
 #define DOF 0          //Module 10DOF
 #define DCF 0          //Module DCF77
 #define SDCARD 0       //Module SD Card
-#define MIC 0          //Module Microfon
+#define MIC 1          //Module Microfon
 #define IRRESV 0         //Module IR
 #define DHT11 1        //Module DHT11
 #define RFM12 0        //Module RMF12B
@@ -252,7 +252,22 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 #endif
 //****************************Mic Config************************
 #if MIC
-
+    #define MIC_PIN A5                                            // Analog port for microphone
+    #define DC_OFFSET  32                                         // DC offset in mic signal - if unusure, leave 0
+    #define NOISE     100                                         // Noise/hum/interference in mic signal and increased value until it went quiet
+    #define SAMPLES   60                                          // Length of buffer for dynamic level adjustment
+    #define TOP (NUM_LEDS + 2)                                    // Allow dot to go slightly off scale
+    #define PEAK_FALL 40                                          // Rate of peak falling dot
+    
+    byte
+    peak      = 0,                                              // Used for falling dot
+    dotCount  = 0,                                              // Frame counter for delaying dot-falling speed
+    volCount  = 0;                                              // Frame counter for storing past volume data
+    int
+    vol[SAMPLES],                                               // Collection of prior volume samples
+    lvl       = 10,                                             // Current "dampened" audio level
+    minLvlAvg = 0,                                              // For dynamic adjustment of graph low & high
+    maxLvlAvg = 512;
 #endif
 //****************************IR Config*************************
 //#if IRRESV
