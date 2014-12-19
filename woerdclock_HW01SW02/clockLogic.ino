@@ -1,7 +1,8 @@
 void clockLogic() {
-	if(millis() >= waitUntilRtc) {
+	if(millis() >= waitUntilClock) {
 		DEBUG_PRINT("Uhrzeit Mode");
-		waitUntilRtc = millis();
+		waitUntilClock = millis();
+                #if RTCLOCK
 		DateTime now = RTC.now();
                 if(testMinutes != now.minute() || testHours != now.hour() || dhtaktion) {
 			dhtaktion = false;    //dht not in aktion 
@@ -12,26 +13,38 @@ void clockLogic() {
 			//displayStrip(defaultColor);
                         displayStrip(LEDcolorR, LEDcolorG, LEDcolorB);
 		}
-		waitUntilRtc += oneSecondDelay;
-	}
-}
-
-void clockLogiColor() {
-  
-  if(millis() >= waitUntilRtc) {
-		DEBUG_PRINT("Uhrzeit Mode Color");
-		waitUntilRtc = millis();
-		DateTime now = RTC.now();
-                if(testMinutes != now.minute() || testHours != now.hour() || dhtaktion) {
+                #endif
+                #if DCFMODUL && !RTCLOCK
+                if(testMinutes != minute() || testHours != hour() || dhtaktion) {
 			dhtaktion = false;    //dht not in aktion 
-                        testMinutes = now.minute();
-		  	testHours = now.hour();
-                        defaultColor = nextColor();
+                        testMinutes = minute();
+		  	testHours = hour();
 			resetAndBlack();
 			timeToStrip(testHours, testMinutes);
-			displayStrip(defaultColor);
-
+			//displayStrip(defaultColor);
+                        displayStrip(LEDcolorR, LEDcolorG, LEDcolorB);
 		}
-		waitUntilRtc += oneSecondDelay;
+                #endif
+		waitUntilClock += oneSecondDelay;
 	}
 }
+
+//void clockLogiColor() {
+//  
+//  if(millis() >= waitUntilClock) {
+//		DEBUG_PRINT("Uhrzeit Mode Color");
+//		waitUntilClock = millis();
+//		DateTime now = RTC.now();
+//                if(testMinutes != now.minute() || testHours != now.hour() || dhtaktion) {
+//			dhtaktion = false;    //dht not in aktion 
+//                        testMinutes = now.minute();
+//		  	testHours = now.hour();
+//                        defaultColor = nextColor();
+//			resetAndBlack();
+//			timeToStrip(testHours, testMinutes);
+//			displayStrip(defaultColor);
+//
+//		}
+//		waitUntilClock += oneSecondDelay;
+//	}
+//}

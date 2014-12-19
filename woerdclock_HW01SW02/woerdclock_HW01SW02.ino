@@ -40,18 +40,18 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 //Which Modules are installed?
 #define CONFIGBUTTON 0 //Config Buttons and adjust Time, SET CONFIGBUTTON or BUTTON 
 #define RTCLOCK 1     //Module Real Time Clock
-#define BUTTON 1      //Button are used  SET CONFIGBUTTON or BUTTON 
+#define BUTTON 0      //Button are used  SET CONFIGBUTTON or BUTTON 
 #define LDR 1         //LDR is used
 #define GENSERIAL 1    //Gen Serial
 #define BLUETOOTH0 1   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
-#define USBPORT0 1     // Serial Communication across usb
+#define USBPORT0 0     // Serial Communication across usb
 #define BLUETOOTH1 0   //Module Bluetooth 1
 #define BLUETOOTH2 0   //Module Bluetooth 2
 #define WLAN 0         //Module WLAN
 #define DOF 0          //Module 10DOF
-#define DCF 0          //Module DCF77
+#define DCFMODUL 1     //Module DCF77
 #define SDCARD 0       //Module SD Card
-#define MIC 1          //Module Microfon
+#define MIC 0          //Module Microfon
 #define IRRESV 0         //Module IR
 #define DHT11 1        //Module DHT11
 #define RFM12 0        //Module RMF12B
@@ -78,7 +78,11 @@ long BAUDRATE = 9600; // default Baudrate for serial communication
 uint8_t strip[NUM_LEDS];    //Array for the aktiv LEDs
 uint8_t stackptr = 0;       //Variable for the next LED to set
 CRGB leds[NUM_LEDS];        //LED Array for FASTLED
-   
+//Clock variables
+  long waitUntilClock = 0;    //Variable Delay for ClockLogic
+  byte ye=0, mo=0, da=0, h=4, m=4, s=4; //Variables to adjust the Clock 
+  int testHours = 0;        //Variables change time? minute or hour?
+  int testMinutes = 0;
 //***************************RTC Config Library************************
 #if RTCLOCK
   #include "RTClib.h"    //Lib for RTC
@@ -86,11 +90,6 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
  //RTC variables
   //boolean RTCpresent=false;
   //unsigned long lastSecond;
-  byte ye=0, mo=0, da=0, h=4, m=4, s=4; //Variables to adjust the RTC
-  //Clock variables
-  int testHours = 0;        //Variables change time? minute or hour?
-  int testMinutes = 0;
-  long waitUntilRtc = 0;    //Variable Delay for RTC 
 #endif
 
 //****************************Button Config**********************
@@ -108,8 +107,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 #endif
 
 //****************************Button ****************************
-#if BUTTON
-  
+#if BUTTON 
   #define ANALOGPIN A6              //Analogpin for Button and LDR
   //Button variables
   #define AUTOENDTIME 5000          //Time for Funktion
@@ -119,6 +117,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 #endif
 //****************************LDR Config************************
 #if LDR
+  #define ANALOGPIN A6              //Analogpin for Button and LDR
   long waitUntilLDR = 0;            // for LDR
 #endif
 //****************************Serial Config******************
@@ -213,11 +212,11 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 #endif
 //****************************Bluetooth1 Config******************
 #if BLUETOOTH1
- SoftwareSerial BTSerial(18, 19); // Connect Arduino Micro pin 19 with HC-06 pin RX and Arduino Micro pin 18 with HC-06 pin TX
+ SoftwareSerial BTSerial(8, 9); // Connect Arduino Micro pin 19 with HC-06 pin RX and Arduino Micro pin 18 with HC-06 pin TX
 #endif
 //****************************Bluetooth2 Config******************
 #if BLUETOOTH2
-  SoftwareSerial BTSerial2(20, 21); // Connect Arduino Micro pin 20 with HC-06 pin RX and Arduino Micro pin 21 with HC-06 pin TX
+  SoftwareSerial BTSerial2(10, 11); // Connect Arduino Micro pin 20 with HC-06 pin RX and Arduino Micro pin 21 with HC-06 pin TX
 #endif
 //****************************WLAN Config************************
 #if WLAN
@@ -228,18 +227,15 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 
 #endif
 //****************************DCF Config************************
-#if DCF
-  //#include <Time.h>
-  //#include <DCF77.h>
+#if DCFMODUL
+#include "DCF77.h"
+#include "Time.h"
   
   #define DCF_PIN 7	         // Connection pin to DCF 77 device
   #define DCF_INTERRUPT 4	 // Interrupt number associated with pin
   
-  //dcf variables
-  //time_t time;
-  //DCF77 DCF = DCF77(DCF_PIN,DCF_INTERRUPT);
-  //bool timeInSync = false;
-  long waitUntilDCF = 0;
+  time_t time;
+  DCF77 DCF = DCF77(DCF_PIN,DCF_INTERRUPT);
 #endif
 //****************************SD Config*************************
 #if SDCARD
@@ -308,7 +304,7 @@ char       cmd[paraCount][paraLength];               //arry with command and par
   int temp = 0;
   
 //  int temperatur = 22;
-  int DHT_TIMER = 0;
+  //int DHT_TIMER = 0;
  
 long waitUntilwriteChar = 0;
 long waitUntilDHT = 0;
@@ -459,9 +455,9 @@ byte brightness = 50;
 const long oneSecondDelay = 1000;
 const long halfSecondDelay = 500;
 
-long waitUntilParty = 0;
+//long waitUntilParty = 0;
 long waitUntilOff = 0;
-long waitUntilFastTest = 0;
+//long waitUntilFastTest = 0;
 long waitUntilHeart = 0;
 
 boolean dhtaktion = false;       //dht in aktion marker
@@ -472,9 +468,9 @@ boolean dhtaktion = false;       //dht in aktion marker
 #else
 	#define DEBUG_PRINT(str)
 #endif
-//****************************Setup*****************************
-//##############################################################
-//***************************************************************
+//****************************Setup*************************************************************************************************************
+//##############################################################################################################################################
+//**********************************************************************************************************************************************
 void setup() {
 	
 	#ifdef DEBUG
@@ -511,10 +507,10 @@ void setup() {
         // following line sets the RTC to the date & time this sketch was compiled
         RTC.adjust(DateTime(__DATE__, __TIME__));
         DEBUG_PRINT("No RTC");
-        resetAndBlack();
-	pushToStrip(0);
-        pushToStrip(3);
-        displayStrip(CRGB::Red);
+//        resetAndBlack();
+//	pushToStrip(0);
+//        pushToStrip(3);
+//        displayStrip(CRGB::Red);
         }	
     #endif
 //***************Setup BUTTON CONFIG***************************
@@ -555,17 +551,8 @@ void setup() {
      #endif
 
 //***************setup DCF*****************************
-    #if DCF
-//	DCF.Start();
-//	setSyncInterval(30);
-//	setSyncProvider(getDCFTime);
-//	DEBUG_PRINT("Waiting for DCF77 time ... ");
-//	DEBUG_PRINT("It will take at least 2 minutes until a first update can be processed.");
-//	while(timeStatus()== timeNotSet) {
-//		// wait until the time is set by the sync provider
-//		DEBUG_PRINT(".");
-//		delay(2000);
-//	}
+    #if DCFMODUL
+	DCF.Start();
     #endif
 //***************setup ir******************************
 //    #if IRRESV	
@@ -639,46 +626,54 @@ void loop() {
     /* All in one serial communication function to interprete command from any serial port*/
     #if GENSERIAL
     serial_com();
-    if (timestamp!=timestampold){
-    timestampold = timestamp;
-    RTC.adjust(DateTime(timestamp));  
-    }
+      #if RTCLOCK
+      if (timestamp!=timestampold){
+      timestampold = timestamp;
+      RTC.adjust(DateTime(timestamp)); 
+     
+      }
+      #endif
     #endif
     
     //ram_info();
     
-    #if DCF
-        //unsigned long getDCFTime() {
-        //	time_t DCFtime = DCF.getTime();
-        //	// Indicator that a time check is done
-        //	if (DCFtime!=0) {
-        //		DEBUG_PRINT("sync");
-        //	}
-        //	return DCFtime;
-        //}
+    #if DCFMODUL
+
+    time_t DCFtime = DCF.getTime(); // Check if new DCF77 time is available
+        if (DCFtime!=0)
+          {
+              DEBUG_PRINT(F("Time is updated"));
+              setTime(DCFtime);
+              #if RTCLOCK
+                RTC.adjust(DateTime(ye, mo, da, hour(), minute(), 0));
+             #endif 
+          }	
+            
      #endif
     //Select Displaymode
 	switch(displayMode) {
 		case 0:              //ONOFF
-			off();
+			//off();
 			break;
 		case 1:              //FAST
-			fastTest();           
+			//fastTest();           
 			break;
 		case 2:              //DISCO
-			disco();
+			#if MIC
+                        disco();
+                        #endif
 			break;
 		case 3:               //ANIM
-			animation();
+			//animation();
 			break;
 		case 4:                //CLOCK
 			clockLogic();
 			break;
                 case 5:                
-			clockLogiColor(); //CLOCK with Color Change
+			//clockLogiColor(); //CLOCK with Color Change
 			break;
 		default:
-                        clockLogiColor();
+                        clockLogic();
 			break;
 	}
 

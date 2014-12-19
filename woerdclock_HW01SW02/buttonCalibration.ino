@@ -106,7 +106,7 @@ void pushSET_C()  {
 
 // this function will read the values for the buttonValues from the EEPROM. It will return true if all values are NOT 0
 
-
+#if BUTTON || CONFIGBUTTON
 boolean alreadyCalibrated(){
   hButtonValue=EEPROM.read(1)*4;
   mButtonValue=EEPROM.read(2)*4;
@@ -115,7 +115,7 @@ boolean alreadyCalibrated(){
   if (hButtonValue*okButtonValue*mButtonValue!=0) return true;
   else return false;
 }
-
+#endif
 
 
 
