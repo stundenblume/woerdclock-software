@@ -24,24 +24,24 @@ void selftest(int pause){
     #endif
 }
 
-void fastTest() {
-	if(millis() >= waitUntilFastTest) {
-		autoBrightnessEnabled = false;
-		DEBUG_PRINT("fastTest");
-		waitUntilFastTest = millis();
-		if(testMinutes >= 60) {
-			testMinutes = 0;
-			testHours++;
-		}
-		if(testHours >= 24) {
-			testHours = 0;
-		}
-		
-		//Array leeren
-		resetAndBlack();
-		timeToStrip(testHours, testMinutes);
-		displayStripRandomColor();
-		testMinutes++;
-		waitUntilFastTest += oneSecondDelay;
-	}
-}
+//void fastTest() {
+//	if(millis() >= waitUntilFastTest) {
+//		autoBrightnessEnabled = false;
+//		DEBUG_PRINT("fastTest");
+//		waitUntilFastTest = millis();
+//		if(testMinutes >= 60) {
+//			testMinutes = 0;
+//			testHours++;
+//		}
+//		if(testHours >= 24) {
+//			testHours = 0;
+//		}
+//		
+//		//Array leeren
+//		resetAndBlack();
+//		timeToStrip(testHours, testMinutes);
+//		displayStripRandomColor();
+//		testMinutes++;
+//		waitUntilFastTest += oneSecondDelay;
+//	}
+//}

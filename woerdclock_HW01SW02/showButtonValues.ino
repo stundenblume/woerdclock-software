@@ -1,5 +1,5 @@
 //this function will show all in EEPROM stored and current values of the buttonValues
-
+#if CONFIGBUTTON
 void showButtonValues(int time){
   alreadyCalibrated();
   resetAndBlack();
@@ -31,7 +31,7 @@ void showButtonValues(int time){
 //  showS(0);
 //  delay(time/2);
 }
-
+#endif
 
 
 

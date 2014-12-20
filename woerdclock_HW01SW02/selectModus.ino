@@ -1,4 +1,5 @@
 // this function let you select the modus
+#if BUTTON
 void selectModus(){
   
   if (analogRead(ANALOGPIN)<10){
@@ -32,6 +33,7 @@ void selectModus(){
         break;
  
       }
+
   // show the new Modus
      switch(displayMode) {
   		case 0:              //ONOFF
@@ -82,5 +84,5 @@ void selectModus(){
       }
     }
 }
-
+#endif
 

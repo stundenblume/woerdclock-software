@@ -38,28 +38,29 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 */
 
 //Which Modules are installed?
-#define RTCLOCK 1     //Module Real Time Clock
-#define BUTTON 1     //Button are used
-#define LDR 0        //LDR is used
-#define GENSERIAL 1     //Gen Serial
-#define BLUETOOTH0 0 //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
-#define USBPORT0 1   // Serial Communication across usb
-#define BLUETOOTH1 1 //Module Bluetooth 1
-#define BLUETOOTH2 0 //Module Bluetooth 2
-#define WLAN 0       //Module WLAN
-#define DOF 0        //Module 10DOF
-#define DCF 0        //Module DCF77
-#define SDCARD 0     //Module SD Card
-#define MIC 0        //Module Microfon
-#define IR 0         //Module IR
-#define DHT11 1      //Module DHT11
-#define RFM12 0      //Module RMF12B
-#define TEXT 0        //Show Text
-
+#define CONFIGBUTTON 0 //Config Buttons and adjust Time, SET CONFIGBUTTON or BUTTON 
+#define RTCLOCK 0     //Module Real Time Clock
+#define BUTTON 0      //Button are used  SET CONFIGBUTTON or BUTTON 
+#define LDR 1         //LDR is used
+#define GENSERIAL 1    //Gen Serial
+#define BLUETOOTH0 1   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
+#define USBPORT0 1     // Serial Communication across usb
+#define BLUETOOTH1 0   //Module Bluetooth 1
+#define BLUETOOTH2 0   //Module Bluetooth 2
+#define WLAN 0         //Module WLAN
+#define DOF 0          //Module 10DOF
+#define DCFMODUL 1     //Module DCF77
+#define SDCARD 0       //Module SD Card
+#define MIC 0          //Module Microfon
+#define IRRESV 0         //Module IR
+#define DHT11 1        //Module DHT11
+#define RFM12 0        //Module RMF12B
+#define TEXT 0        //Show Massage Board 
+#define TEXT2 1        //Show Text
 
 
 //Debug Mode or not (uncommand)
-#define DEBUG 1
+#define DEBUG 0
 //****************************LED Config************************
 //Library includes
 #include <FastLED.h>
@@ -71,46 +72,53 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 long BAUDRATE = 9600; // default Baudrate for serial communication
  
 //PIN defines
-#define STRIP_DATA_PIN 21
-//#define ARDUINO_LED 5           //Default Arduino LED
+#define STRIP_DATA_PIN 8
 
 //LED varables
-uint8_t strip[NUM_LEDS];
-uint8_t stackptr = 0;
-CRGB leds[NUM_LEDS];
-   
-//****************************RTC Config Library************************
-#if RTCLOCK
-  #include "RTClib.h"
-  RTC_DS1307 RTC;
- //RTC variables
-  boolean RTCpresent=false;
-  unsigned long lastSecond;
-  byte ye=0, mo=0, da=0, h=4, m=4, s=4;
-  //Clock variables
-  uint8_t selectedLanguageMode = 0;
-  const uint8_t RHEIN_RUHR_MODE = 0; //Define?
-  const uint8_t WESSI_MODE = 1;
-  //Auto Brightness On or Off
-  int testHours = 0;
+uint8_t strip[NUM_LEDS];    //Array for the aktiv LEDs
+uint8_t stackptr = 0;       //Variable for the next LED to set
+CRGB leds[NUM_LEDS];        //LED Array for FASTLED
+//Clock variables
+  long waitUntilClock = 0;    //Variable Delay for ClockLogic
+  byte ye=0, mo=0, da=0, h=4, m=4, s=4; //Variables to adjust the Clock 
+  int testHours = 0;        //Variables change time? minute or hour?
   int testMinutes = 0;
-  long waitUntilRtc = 0;
+//***************************RTC Config Library************************
+#if RTCLOCK
+  #include "RTClib.h"    //Lib for RTC
+  RTC_DS1307 RTC;        //TYP of RTC
+ //RTC variables
+  //boolean RTCpresent=false;
+  //unsigned long lastSecond;
 #endif
+
 //****************************Button Config**********************
-#if BUTTON
+#if CONFIGBUTTON
   
-  #define ANALOGPIN A1              //Analogpin for Button and LDR
+  #define ANALOGPIN A6         //Analogpin for Button and LDR
   //Button variables
-  #define CHARSHOWTIME 600
-  #define AUTOENDTIME 5000
-  #define TIMEEXTENSION 10000
-  #define TOLLERANCE 10
-  boolean menue=false,debugmod=true, modus=false;
-  int hButtonValue=1,mButtonValue=2,okButtonValue=4;
+  //#define CHARSHOWTIME 600     //
+  #define AUTOENDTIME 5000       //Time for Funktion 
+  #define TIMEEXTENSION 10000    //Time for Funktion ButtonCali 
+  #define TOLLERANCE 10          //Tollerance for the ButtonsValue
+  
+  boolean menue=false,debugmod=true, modus=false;    //Modi for the Config
+  int hButtonValue=1,mButtonValue=2,okButtonValue=4; //Variable for the ButtonValue
+#endif
+
+//****************************Button ****************************
+#if BUTTON 
+  #define ANALOGPIN A6              //Analogpin for Button and LDR
+  //Button variables
+  #define AUTOENDTIME 5000          //Time for Funktion
+  #define TOLLERANCE 10             //Tollerance for the ButtonsValue
+  boolean modus=false;              //Modi for the Config
+  int hButtonValue=1,mButtonValue=2,okButtonValue=4;//Variable for the ButtonValue
 #endif
 //****************************LDR Config************************
 #if LDR
-  long waitUntilLDR = 0;
+  #define ANALOGPIN A6              //Analogpin for Button and LDR
+  long waitUntilLDR = 0;            // for LDR
 #endif
 //****************************Serial Config******************
 #if GENSERIAL
@@ -119,7 +127,7 @@ CRGB leds[NUM_LEDS];
  boolean showvalues = false; // For debugging only
  boolean LED[NUM_LEDS] = {0};// this is a dummy array for the LEDs of wordclock 0=off, 1=on
  long timestamp = 0;  // this is a dummy variable for the date and time in unix time stamp format (see http://playground.arduino.cc/Code/Time )
- 
+ long timestampold = 0;//this is variable for the old dummy
  /* Start command definitions for serial communication - don't touch this 
     based on parser for serial communication on Arduino by (c) 140801 Thomas Peetz */
 /*
@@ -128,7 +136,7 @@ CRGB leds[NUM_LEDS];
   cmdCount defines the number of entities
   cmdStrCon defines the commands in lower case!!
 */
-const byte  paraCount = 4;                            // max quantity of parameter (incl. command) per line    slc = r,g,b
+const byte  paraCount = 5;                            // max quantity of parameter (incl. command) per line    slc = NR,r,g,b
 const byte  paraLength = 5;                           // max length per parameter/command (-1)                 help,show
 const byte  cmdCount = 16;                            // quantity of possible commands                        show to slcp
 const char cmdStrCon[cmdCount][paraLength]=
@@ -164,20 +172,51 @@ const char cmdStrCon[cmdCount][paraLength]=
   ,{
     "ghum"}
   ,{
-    "mode"}
+    "smod"}
 };
 char       cmdStr[paraCount*paraLength+paraCount+1]; //buffer for complete line of comand and parameter
 int        cmdStrIn=0;                               //index for the cmdStr 
 char       cmd[paraCount][paraLength];               //arry with command and parameters
 /* End command definitons for serial communication - don't touch this */
+
+  #if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
+  
+    /* Welcome + help text */
+    const char strwelcome[]  = "\nWelcome to WördClock Controller Interface  \n\r version 0.72";
+    const char strhelp1[] = 
+    "\n Possible commands are:"
+    "\n\r help           help text"
+    "\n\r slb=0-255       set led brightness 0-255"
+    "\n\r glb            get led brightness"
+    "\n\r slbp           store led brightness permanent"
+    "\n\r glbp           get permanent led brightness"
+    "\n\r slc=R,G,B      set led color (R,G,B) (0-255)"
+    "\n\r glc            get led color";
+    
+    const char strhelp2[] =
+    "\n\r slcp           store led color permanent"
+    "\n\r glcp           get permanent led color"
+    "\n\r sled=0-114,0/1 set led by number off/on"
+    "\n\r srtc           set unix time stamp for clock"
+    "\n\r grtc           get unix time stamp and time from clock";
+  
+    const char strhelp3[] =
+    "\n\r gtem           get temperature"
+    "\n\r ghum           get humidity"
+    "\n\r mode           set the mode\n";
+  
+    const char strerror[] = "error";
+    const char paramseperator = ',';
+    const char cmdbreak = '\n';
+  #endif
 #endif
 //****************************Bluetooth1 Config******************
 #if BLUETOOTH1
- SoftwareSerial BTSerial(8, 9); // Connect Arduino Micro pin 9 with HC-06 pin RX and Arduino Micro pin 8 with HC-06 pin TX
+ SoftwareSerial BTSerial(8, 9); // Connect Arduino Micro pin 19 with HC-06 pin RX and Arduino Micro pin 18 with HC-06 pin TX
 #endif
 //****************************Bluetooth2 Config******************
 #if BLUETOOTH2
-  SoftwareSerial BTSerial2(10, 11); // Connect Arduino Micro pin 15 with HC-06 pin RX and Arduino Micro pin 14 with HC-06 pin TX
+  SoftwareSerial BTSerial2(10, 11); // Connect Arduino Micro pin 20 with HC-06 pin RX and Arduino Micro pin 21 with HC-06 pin TX
 #endif
 //****************************WLAN Config************************
 #if WLAN
@@ -188,18 +227,15 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 
 #endif
 //****************************DCF Config************************
-#if DCF
-  //#include <Time.h>
-  //#include <DCF77.h>
+#if DCFMODUL
+#include "DCF77.h"
+#include "Time.h"
   
   #define DCF_PIN 7	         // Connection pin to DCF 77 device
   #define DCF_INTERRUPT 4	 // Interrupt number associated with pin
   
-  //dcf variables
-  //time_t time;
-  //DCF77 DCF = DCF77(DCF_PIN,DCF_INTERRUPT);
-  //bool timeInSync = false;
-  long waitUntilDCF = 0;
+  time_t time;
+  DCF77 DCF = DCF77(DCF_PIN,DCF_INTERRUPT);
 #endif
 //****************************SD Config*************************
 #if SDCARD
@@ -207,45 +243,60 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 #endif
 //****************************Mic Config************************
 #if MIC
-
+    #define MIC_PIN A5                                            // Analog port for microphone
+    #define DC_OFFSET  32                                         // DC offset in mic signal - if unusure, leave 0
+    #define NOISE     100                                         // Noise/hum/interference in mic signal and increased value until it went quiet
+    #define SAMPLES   60                                          // Length of buffer for dynamic level adjustment
+    #define TOP (NUM_LEDS + 2)                                    // Allow dot to go slightly off scale
+    #define PEAK_FALL 40                                          // Rate of peak falling dot
+    
+    byte
+    peak      = 0,                                              // Used for falling dot
+    dotCount  = 0,                                              // Frame counter for delaying dot-falling speed
+    volCount  = 0;                                              // Frame counter for storing past volume data
+    int
+    vol[SAMPLES],                                               // Collection of prior volume samples
+    lvl       = 10,                                             // Current "dampened" audio level
+    minLvlAvg = 0,                                              // For dynamic adjustment of graph low & high
+    maxLvlAvg = 512;
 #endif
 //****************************IR Config*************************
-#if IR
-  //#include <IRremote.h>
-  // IR defines
-  ////Modus variables
-  #define ONOFF 0
-  #define FAST  1
-  #define DISCO 2
-  #define ANIM  3
-  #define CLOCK 4
-  
-  //#define ONOFF 0xFF02FD
-  #define AUTO 0xFFF00F
-  #define BLUE_DOWN 0xFF48B7
-  #define BLUE_UP 0xFF6897
-  #define BRIGHTER 0xFF3AC5
-  #define DIM 0xFFBA45
-  #define DIY1 0xFF30CF
-  #define DIY2 0xFFB04F
-  #define DIY3 0xFF708F
-  #define DIY4 0xFF10EF
-  #define DIY5 0xFF906F
-  #define DIY6 0xFF50AF
-  #define FLASH 0xFFD02F
-  #define QUICK 0xFFE817
-  #define SLOW 0xFFC837
-  
-  #define IR_RECV_PIN 6
-  
-  //IR variables
-  IRrecv irrecv = IRrecv(IR_RECV_PIN);
-  decode_results irDecodeResults;
-#endif
+//#if IRRESV
+//  #include <IRremote.h>
+//  // IR defines
+//  ////Modus variables
+//  #define ONOFF 0
+//  #define FAST  1
+//  #define DISCO 2
+//  #define ANIM  3
+//  #define CLOCK 4
+//  
+//  //#define ONOFF 0xFF02FD
+//  #define AUTO 0xFFF00F
+//  #define BLUE_DOWN 0xFF48B7
+//  #define BLUE_UP 0xFF6897
+//  #define BRIGHTER 0xFF3AC5
+//  #define DIM 0xFFBA45
+//  #define DIY1 0xFF30CF
+//  #define DIY2 0xFFB04F
+//  #define DIY3 0xFF708F
+//  #define DIY4 0xFF10EF
+//  #define DIY5 0xFF906F
+//  #define DIY6 0xFF50AF
+//  #define FLASH 0xFFD02F
+//  #define QUICK 0xFFE817
+//  #define SLOW 0xFFC837
+//  
+//  #define IR_RECV_PIN 6
+//  
+//  //IR variables
+//  IRrecv irrecv = IRrecv(IR_RECV_PIN);
+//  decode_results irDecodeResults;
+//#endif
 //****************************DHT11 Config**********************
 #if DHT11
   #include "DHT.h"
-  #define DHTPIN 8   
+  #define DHTPIN 6   
   #define DHTTYPE DHT11 
   DHT dht(DHTPIN, DHTTYPE);
 
@@ -253,7 +304,7 @@ char       cmd[paraCount][paraLength];               //arry with command and par
   int temp = 0;
   
 //  int temperatur = 22;
-  int DHT_TIMER = 0;
+  //int DHT_TIMER = 0;
  
 long waitUntilwriteChar = 0;
 long waitUntilDHT = 0;
@@ -301,7 +352,82 @@ const boolean array7 [6][10] =  {{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,1,1,0,0,0},{0,
 const boolean array8 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};        
 const boolean array9 [6][10] =  {{0,0,1,1,0,0,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};            
 const boolean array0 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
-  
+#endif
+//**************************************************************
+#if TEXT2
+byte startrow = 0;
+
+const char array1 [5] =  {
+B00000100,
+B00000100,
+B00000100,
+B00000100,
+B00000100
+};
+const char array2 [5] =  {
+B00001111,
+B00000001,
+B00001111,
+B00001000,
+B00001111
+};             
+const char array3 [5] =  {
+B00001111,
+B00000001,
+B00000111,
+B00000001,
+B00001111
+};
+const char array4 [5] =  {
+B00001000,
+B00001010,
+B00001111,
+B00000010,
+B00000010
+};             
+const char array5 [5] =  {
+B00001111,
+B00001000,
+B00001111,
+B00000001,
+B00001111
+};           
+const char array6 [5] =  {
+B00001111,
+B00001000,
+B00001111,
+B00001001,
+B00001111
+};             
+const char array7 [5] =  {
+B00001111,
+B00000001,
+B00000001,
+B00000001,
+B00000001
+};             
+const char array8 [5] =  {
+B00001111,
+B00001001,
+B00001111,
+B00001001,
+B00001111
+};        
+const char array9 [5] =  {
+B00001111,
+B00001001,
+B00001111,
+B00000001,
+B00001111
+};            
+const char array0 [5] =  {
+B00001111,
+B00001001,
+B00001001,
+B00001001,
+B00001111
+};
+
 #endif
 //****************************RFM12 Config**********************
 #if RFM12
@@ -329,22 +455,22 @@ byte brightness = 50;
 const long oneSecondDelay = 1000;
 const long halfSecondDelay = 500;
 
-long waitUntilParty = 0;
+//long waitUntilParty = 0;
 long waitUntilOff = 0;
-long waitUntilFastTest = 0;
+//long waitUntilFastTest = 0;
 long waitUntilHeart = 0;
 
 boolean dhtaktion = false;       //dht in aktion marker
 
 //****************************Debug Config**********************
-#ifdef DEBUG
+#if DEBUG
 	#define DEBUG_PRINT(str)  Serial.println (str)
 #else
 	#define DEBUG_PRINT(str)
 #endif
-//****************************Setup*****************************
-//##############################################################
-//***************************************************************
+//****************************Setup*************************************************************************************************************
+//##############################################################################################################################################
+//**********************************************************************************************************************************************
 void setup() {
 	
 	#ifdef DEBUG
@@ -368,7 +494,7 @@ void setup() {
         Wire.begin();
         RTC.begin();
         if (RTC.isrunning()) {
-          RTCpresent = true;
+          //RTCpresent = true;
           DateTime now = RTC.now();
           ye=now.year();
           mo=now.month();
@@ -381,18 +507,18 @@ void setup() {
         // following line sets the RTC to the date & time this sketch was compiled
         RTC.adjust(DateTime(__DATE__, __TIME__));
         DEBUG_PRINT("No RTC");
-        resetAndBlack();
-	pushToStrip(0);
-        pushToStrip(3);
-        displayStrip(CRGB::Red);
+//        resetAndBlack();
+//	pushToStrip(0);
+//        pushToStrip(3);
+//        displayStrip(CRGB::Red);
         }	
     #endif
-//***************Setup BUTTON***************************
-     #if BUTTON
+//***************Setup BUTTON CONFIG***************************
+     #if CONFIGBUTTON
         if(analogRead(ANALOGPIN)<10) menue = true;        //Menue start with Jumper
-     #if DHT11   
+      
         selftest(100); // test all LEDs and write "HALLO"                  
-     #endif
+     
         if (menue && analogRead(ANALOGPIN)>10) {          //Debug start with Jumper set after selftest, nothing to debug!
           debugmod=true;
           menue=false;
@@ -415,24 +541,23 @@ void setup() {
         if (menue && calibOK) adjustTime(); // if the jumper ist open AND the there is al calibration for the buttonValus, go to adjust the time
      #endif
 
+//***************Setup BUTTON***************************
+     #if BUTTON     
+        selftest(100);                                   // test all LEDs and write "HALLO" 
+        boolean calibOK = alreadyCalibrated();           // Check if there is was already a calibration of the buttons         
+        if (!calibOK){
+        DEBUG_PRINT(F("Button not calibrated"));
+        }
+     #endif
 
 //***************setup DCF*****************************
-    #if DCF
-//	DCF.Start();
-//	setSyncInterval(30);
-//	setSyncProvider(getDCFTime);
-//	DEBUG_PRINT("Waiting for DCF77 time ... ");
-//	DEBUG_PRINT("It will take at least 2 minutes until a first update can be processed.");
-//	while(timeStatus()== timeNotSet) {
-//		// wait until the time is set by the sync provider
-//		DEBUG_PRINT(".");
-//		delay(2000);
-//	}
+    #if DCFMODUL
+	DCF.Start();
     #endif
 //***************setup ir******************************
-    #if IR	
-      irrecv.enableIRIn();
-    #endif
+//    #if IRRESV	
+//      irrecv.enableIRIn();
+//    #endif
 //***************setup Bluetooth WLAN ********************** 
 #if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
   /* You need this in your setup for serial communication */
@@ -482,7 +607,7 @@ void setup() {
 }
 
 void loop() {
-    #if IR	
+    #if IRRESV	
         doIRLogic();
     #endif
 
@@ -499,45 +624,56 @@ void loop() {
     #endif
     
     /* All in one serial communication function to interprete command from any serial port*/
-    //#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
     #if GENSERIAL
     serial_com();
+      #if RTCLOCK
+      if (timestamp!=timestampold){
+      timestampold = timestamp;
+      RTC.adjust(DateTime(timestamp)); 
+     
+      }
+      #endif
     #endif
     
     //ram_info();
     
-    #if DCF
-        //unsigned long getDCFTime() {
-        //	time_t DCFtime = DCF.getTime();
-        //	// Indicator that a time check is done
-        //	if (DCFtime!=0) {
-        //		DEBUG_PRINT("sync");
-        //	}
-        //	return DCFtime;
-        //}
+    #if DCFMODUL
+
+    time_t DCFtime = DCF.getTime(); // Check if new DCF77 time is available
+        if (DCFtime!=0)
+          {
+              DEBUG_PRINT(F("Time is updated"));
+              setTime(DCFtime);
+              #if RTCLOCK
+                RTC.adjust(DateTime(ye, mo, da, hour(), minute(), 0));
+             #endif 
+          }	
+            
      #endif
     //Select Displaymode
 	switch(displayMode) {
 		case 0:              //ONOFF
-			off();
+			//off();
 			break;
 		case 1:              //FAST
-			fastTest();           
+			//fastTest();           
 			break;
 		case 2:              //DISCO
-			disco();
+			#if MIC
+                        disco();
+                        #endif
 			break;
 		case 3:               //ANIM
-			animation();
+			//animation();
 			break;
 		case 4:                //CLOCK
 			clockLogic();
 			break;
                 case 5:                
-			clockLogiColor(); //CLOCK with Color Change
+			//clockLogiColor(); //CLOCK with Color Change
 			break;
 		default:
-                        clockLogiColor();
+                        clockLogic();
 			break;
 	}
 

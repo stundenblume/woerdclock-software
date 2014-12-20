@@ -1,4 +1,5 @@
 // this function let you adjust the time
+#if CONFIGBUTTON
 void adjustTime(){
    DEBUG_PRINT("adjustTime");
    pushSET_T();
@@ -46,8 +47,9 @@ void adjustTime(){
     RTC.adjust(DateTime(ye, mo, da, h, m, 0));
   } // if the RTC is present, store the new time in the RTC
 }
-
+#endif
 // check from the analog reading wich button is pressed
+#if BUTTON || CONFIGBUTTON
 byte whichButtonPressed(int val){
   byte button;
   
@@ -58,6 +60,8 @@ byte whichButtonPressed(int val){
 
   return button; // return the number from wich button is pressed
 }
+#endif
+
 
  void pushSET_T()  {
 	resetAndBlack();

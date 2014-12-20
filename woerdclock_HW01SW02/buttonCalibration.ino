@@ -1,3 +1,4 @@
+#if CONFIGBUTTON
 boolean buttonCalibration(){
 DEBUG_PRINT("buttonCalibration");
 DEBUG_PRINT("Value=");
@@ -55,7 +56,7 @@ DEBUG_PRINT(analogRead(ANALOGPIN));
   }
   showButtonValues(5000); // show the values of the buttonValues and wich values for them are stored in the EEPROM
 }
-
+#endif
 void pushSET_C()  {
         resetAndBlack();
         
@@ -103,28 +104,9 @@ void pushSET_C()  {
         displayStrip(defaultColor);
 }
 
-
-//void pushSET_()  {
-//        resetAndBlack();
-//        
-//	pushToStrip(koordinate(0,0));      //S
-//	pushToStrip(koordinate(1,0));
-//	pushToStrip(koordinate(2,0));
-//	pushToStrip(koordinate(0,1));
-//	pushToStrip(koordinate(0,2));
-//        pushToStrip(koordinate(1,2));
-//        pushToStrip(koordinate(2,2));
-//        pushToStrip(koordinate(3,2));
-//        pushToStrip(koordinate(4,2));
-//        pushToStrip(koordinate(4,1));
-//        pushToStrip(koordinate(4,0));
-//        
-//        displayStrip(defaultColor);
-//}
-
-
 // this function will read the values for the buttonValues from the EEPROM. It will return true if all values are NOT 0
 
+#if BUTTON || CONFIGBUTTON
 boolean alreadyCalibrated(){
   hButtonValue=EEPROM.read(1)*4;
   mButtonValue=EEPROM.read(2)*4;
@@ -133,7 +115,7 @@ boolean alreadyCalibrated(){
   if (hButtonValue*okButtonValue*mButtonValue!=0) return true;
   else return false;
 }
-
+#endif
 
 
 

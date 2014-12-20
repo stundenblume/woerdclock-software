@@ -23,38 +23,6 @@
     actually, it is not possible to use two software serial ports at the same time
 */
 
-#if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
-
-  /* Welcome + help text */
-  const char strwelcome[]  = "\nWelcome to WördClock Controller Interface  \n\r version 0.72";
-  const char strhelp1[] = 
-  "\n Possible commands are:"
-  "\n\r help           help text"
-  "\n\r slb=0-255 	set led brightness 0-255"
-  "\n\r glb            get led brightness"
-  "\n\r slbp           store led brightness permanent"
-  "\n\r glbp           get permanent led brightness"
-  "\n\r slc=R,G,B      set led color (R,G,B) (0-255)"
-  "\n\r glc            get led color";
-  
-  const char strhelp2[] =
-  "\n\r slcp           store led color permanent"
-  "\n\r glcp           get permanent led color"
-  "\n\r sled=0-114,0/1 set led by number off/on"
-  "\n\r srtc           set unix time stamp for clock"
-  "\n\r grtc           get unix time stamp and time from clock";
-
-  const char strhelp3[] =
-  "\n\r gtem           get temperature"
-  "\n\r ghum           get humidity"
-  "\n\r mode           set the mode\n";
-
-  const char strerror[] = "error";
-  const char paramseperator = ',';
-  const char cmdbreak = '\n';
-#endif
-
-
 /* Serial communication */
 #if GENSERIAL
 void serial_com(void)
@@ -64,6 +32,7 @@ void serial_com(void)
       If usb send permanent data, bluetooth will be ignored.
       If you dislike this, we need a state machine.
   */
+  //DEBUG_PRINT(F("Serial logic"));
   serial_com_port = 255; //default, means no port
   
   #if USBPORT0
@@ -127,7 +96,7 @@ void serial_interprete()
   int i,j,k;
   if(serial_com_port<4){                   // check to see if at least one character is available
     char ch=read_serial();
-    //Serial.print(ch);                       // echo
+    Serial.print(ch);                       // echo
     if(int(ch)>32)                          // ignore spaces 
       cmdStr[cmdStrIn++]=ch;
     cmdStr[cmdStrIn]='\0';
@@ -178,7 +147,7 @@ void serial_interprete()
         {
           write_serial_str(strwelcome[i]);
         }
-        
+/*        
         for(int i=0 ; i<sizeof(strhelp1)-1 ; i++)
         {
           write_serial_str(strhelp1[i]);
@@ -193,7 +162,7 @@ void serial_interprete()
         {
           write_serial_str(strhelp3[i]);
         }
- 
+*/ 
         break;
         
       case  2: //slb = set_led_brightness (store in SRAM)
@@ -253,14 +222,34 @@ void serial_interprete()
         write_serial(EEPROM.read(7));
         write_serial_str(cmdbreak);
       break;
-
+      
+      case 10: //sled = set_led with a color
+          leds[atoi(cmd[1])] = CRGB(atoi(cmd[2]), atoi(cmd[3]), atoi(cmd[4]));
+      break;
+/* Before the color option was integrated, only on or off
       case 10: //sled = set_led on/off
         if (cmd[2][0]=='0')
           LED[atoi(cmd[1])]=0;
         if (cmd[2][0]=='1')
           LED[atoi(cmd[1])]=1;
       break;
-      
+*/      
+
+      case 11: //gled = get_led
+          write_serial_cmd(j);
+          for(int i=0 ; i<sizeof(LED) ; i++)
+          {
+            write_serial(i);
+            write_serial_str(paramseperator);
+            write_serial(leds[i].r);
+            write_serial_str(paramseperator);
+            write_serial(leds[i].g);
+            write_serial_str(paramseperator);
+            write_serial(leds[i].b);
+            write_serial_str(cmdbreak);
+          }
+      break;
+/* Before the color option was integrated, only on or off 
       case 11: //gled = get_led
         write_serial_cmd(j);
         for(int i=0 ; i<sizeof(LED) ; i++)
@@ -273,6 +262,7 @@ void serial_interprete()
         }
         write_serial_str(cmdbreak);
       break;
+ */
 
       case 12: //srtc = set_real_time_clock
         timestamp=atoi(cmd[1]);
