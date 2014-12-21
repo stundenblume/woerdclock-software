@@ -6,7 +6,7 @@ void selectModus(){
     unsigned long start = millis(); // store the time, so you can leaf this menue afer a given time 
     while (millis()-start<AUTOENDTIME && !modus){                          //5s time to presses the h Button to start the select Modus
       int okButtonpressed = whichButtonPressed(analogRead(ANALOGPIN));
-      if(okButtonpressed == 3){
+      if(okButtonpressed == 2){
         modus = true;
         //okButtonpressed = 0;
       }
@@ -26,7 +26,7 @@ void selectModus(){
         break;
   
         
-      case 2:
+      case 3:
         start = millis();
         displayMode--;
         if (displayMode<0) displayMode=4;

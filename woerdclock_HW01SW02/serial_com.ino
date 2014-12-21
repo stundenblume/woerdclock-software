@@ -96,7 +96,7 @@ void serial_interprete()
   int i,j,k;
   if(serial_com_port<4){                   // check to see if at least one character is available
     char ch=read_serial();
-    //Serial.print(ch);                       // echo
+    Serial.print(ch);                       // echo
     if(int(ch)>32)                          // ignore spaces 
       cmdStr[cmdStrIn++]=ch;
     cmdStr[cmdStrIn]='\0';
@@ -147,7 +147,7 @@ void serial_interprete()
         {
           write_serial_str(strwelcome[i]);
         }
-        
+/*        
         for(int i=0 ; i<sizeof(strhelp1)-1 ; i++)
         {
           write_serial_str(strhelp1[i]);
@@ -162,7 +162,7 @@ void serial_interprete()
         {
           write_serial_str(strhelp3[i]);
         }
- 
+*/ 
         break;
         
       case  2: //slb = set_led_brightness (store in SRAM)
@@ -222,14 +222,34 @@ void serial_interprete()
         write_serial(EEPROM.read(7));
         write_serial_str(cmdbreak);
       break;
-
+      
+      case 10: //sled = set_led with a color
+          leds[atoi(cmd[1])] = CRGB(atoi(cmd[2]), atoi(cmd[3]), atoi(cmd[4]));
+      break;
+/* Before the color option was integrated, only on or off
       case 10: //sled = set_led on/off
         if (cmd[2][0]=='0')
           LED[atoi(cmd[1])]=0;
         if (cmd[2][0]=='1')
           LED[atoi(cmd[1])]=1;
       break;
-      
+*/      
+
+      case 11: //gled = get_led
+          write_serial_cmd(j);
+          for(int i=0 ; i<sizeof(LED) ; i++)
+          {
+            write_serial(i);
+            write_serial_str(paramseperator);
+            write_serial(leds[i].r);
+            write_serial_str(paramseperator);
+            write_serial(leds[i].g);
+            write_serial_str(paramseperator);
+            write_serial(leds[i].b);
+            write_serial_str(cmdbreak);
+          }
+      break;
+/* Before the color option was integrated, only on or off 
       case 11: //gled = get_led
         write_serial_cmd(j);
         for(int i=0 ; i<sizeof(LED) ; i++)
@@ -242,9 +262,10 @@ void serial_interprete()
         }
         write_serial_str(cmdbreak);
       break;
+ */
 
       case 12: //srtc = set_real_time_clock
-        timestamp=atoi(cmd[1]);
+        timestamp=atol(cmd[1]);
       break;
 
       #if DHT11

@@ -44,12 +44,12 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define LDR 1         //LDR is used
 #define GENSERIAL 1    //Gen Serial
 #define BLUETOOTH0 1   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
-#define USBPORT0 0     // Serial Communication across usb
+#define USBPORT0 1     // Serial Communication across usb
 #define BLUETOOTH1 0   //Module Bluetooth 1
 #define BLUETOOTH2 0   //Module Bluetooth 2
 #define WLAN 0         //Module WLAN
 #define DOF 0          //Module 10DOF
-#define DCFMODUL 1     //Module DCF77
+#define DCFMODUL 0     //Module DCF77
 #define SDCARD 0       //Module SD Card
 #define MIC 0          //Module Microfon
 #define IRRESV 0         //Module IR
@@ -88,7 +88,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
   #include "RTClib.h"    //Lib for RTC
   RTC_DS1307 RTC;        //TYP of RTC
  //RTC variables
-  //boolean RTCpresent=false;
+  boolean RTCpresent=false;
   //unsigned long lastSecond;
 #endif
 
@@ -103,7 +103,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
   #define TOLLERANCE 10          //Tollerance for the ButtonsValue
   
   boolean menue=false,debugmod=true, modus=false;    //Modi for the Config
-  int hButtonValue=1,mButtonValue=2,okButtonValue=4; //Variable for the ButtonValue
+  int uButtonValue=1,dButtonValue=2,okButtonValue=4; //Variable for the ButtonValue
 #endif
 
 //****************************Button ****************************
@@ -113,7 +113,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
   #define AUTOENDTIME 5000          //Time for Funktion
   #define TOLLERANCE 10             //Tollerance for the ButtonsValue
   boolean modus=false;              //Modi for the Config
-  int hButtonValue=1,mButtonValue=2,okButtonValue=4;//Variable for the ButtonValue
+  int uButtonValue=1,dButtonValue=2,okButtonValue=4;//Variable for the ButtonValue
 #endif
 //****************************LDR Config************************
 #if LDR
@@ -136,8 +136,8 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
   cmdCount defines the number of entities
   cmdStrCon defines the commands in lower case!!
 */
-const byte  paraCount = 4;                            // max quantity of parameter (incl. command) per line    slc = r,g,b
-const byte  paraLength = 5;                           // max length per parameter/command (-1)                 help,show
+const byte  paraCount = 5;                            // max quantity of parameter (incl. command) per line    slc = NR,r,g,b
+const byte  paraLength = 11;                           // max length per parameter/command (-1)                 help,show
 const byte  cmdCount = 16;                            // quantity of possible commands                        show to slcp
 const char cmdStrCon[cmdCount][paraLength]=
 {
@@ -172,7 +172,7 @@ const char cmdStrCon[cmdCount][paraLength]=
   ,{
     "ghum"}
   ,{
-    "mode"}
+    "smod"}
 };
 char       cmdStr[paraCount*paraLength+paraCount+1]; //buffer for complete line of comand and parameter
 int        cmdStrIn=0;                               //index for the cmdStr 
@@ -463,7 +463,7 @@ long waitUntilHeart = 0;
 boolean dhtaktion = false;       //dht in aktion marker
 
 //****************************Debug Config**********************
-#ifdef DEBUG
+#if DEBUG
 	#define DEBUG_PRINT(str)  Serial.println (str)
 #else
 	#define DEBUG_PRINT(str)
@@ -628,9 +628,11 @@ void loop() {
     serial_com();
       #if RTCLOCK
       if (timestamp!=timestampold){
+      timestamp += 3600;
       timestampold = timestamp;
+      DEBUG_PRINT(F("Time is "));
+      DEBUG_PRINT(timestamp);
       RTC.adjust(DateTime(timestamp)); 
-     
       }
       #endif
     #endif

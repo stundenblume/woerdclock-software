@@ -19,7 +19,7 @@ void dhtRead(){
           #endif
           return;
         }
-      #ifdef DEBUG
+      #if DEBUG
         Serial.print(F("Feuchte:"));
         Serial.print(humi);
         Serial.println(F(" %"));

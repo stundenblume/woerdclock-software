@@ -162,17 +162,17 @@ void pushFUENF1() {
 }
 
 void pushFUENF2() {
-	pushToStrip(koordinate(7,6));
-	pushToStrip(koordinate(8,6));
-	pushToStrip(koordinate(9,6));
-	pushToStrip(koordinate(10,6));
+	pushToStrip(koordinate(7,4));
+	pushToStrip(koordinate(8,4));
+	pushToStrip(koordinate(9,4));
+	pushToStrip(koordinate(10,4));
 }
 
 void pushNACH() {
-	pushToStrip(koordinate(2,3));
-	pushToStrip(koordinate(3,3));
-	pushToStrip(koordinate(4,3));
-	pushToStrip(koordinate(5,3));
+	pushToStrip(koordinate(7,3));
+	pushToStrip(koordinate(8,3));
+	pushToStrip(koordinate(9,3));
+	pushToStrip(koordinate(10,3));
 }
 
 void pushZEHN1() {
@@ -193,9 +193,9 @@ void pushVIERTEL() {
 }
 
 void pushVOR() {
-	pushToStrip(koordinate(6,3));
-	pushToStrip(koordinate(7,3));
-	pushToStrip(koordinate(8,3));
+	pushToStrip(koordinate(0,3));
+	pushToStrip(koordinate(1,3));
+	pushToStrip(koordinate(2,3));
 }
 
 void pushHALB() {
@@ -206,19 +206,19 @@ void pushHALB() {
 }
 
 void pushONE() {
-	pushToStrip(3);
+	pushToStrip(0);
 }
 
 void pushTWO() {
-	pushToStrip(2);
-}
-
-void pushTHREE() {
 	pushToStrip(1);
 }
 
+void pushTHREE() {
+	pushToStrip(2);
+}
+
 void pushFOUR() {
-	pushToStrip(0);
+	pushToStrip(3);
 }
 
 void pushZWANZIG() {
@@ -232,86 +232,86 @@ void pushZWANZIG() {
 }
 
 void pushZWOELF() {
-	pushToStrip(koordinate(5,4));
-	pushToStrip(koordinate(6,4));
-	pushToStrip(koordinate(7,4));
-	pushToStrip(koordinate(8,4));
-	pushToStrip(koordinate(9,4));
+	pushToStrip(koordinate(6,8));
+	pushToStrip(koordinate(7,8));
+	pushToStrip(koordinate(8,8));
+	pushToStrip(koordinate(9,8));
+	pushToStrip(koordinate(10,8));
 }
 
 void pushEINS(bool s) 
 {
+	pushToStrip(koordinate(0,5));
+	pushToStrip(koordinate(1,5));
 	pushToStrip(koordinate(2,5));
-	pushToStrip(koordinate(3,5));
-	pushToStrip(koordinate(4,5));
 	if(s) {
-		pushToStrip(koordinate(5,5));
+		pushToStrip(koordinate(3,5));
 	}
 }
 
 void pushZWEI() {
-	pushToStrip(koordinate(0,5));
-	pushToStrip(koordinate(1,5));
-	pushToStrip(koordinate(2,5));
-	pushToStrip(koordinate(3,5));
-}
-
-void pushDREI() {
-	pushToStrip(koordinate(1,6));
-	pushToStrip(koordinate(2,6));
-	pushToStrip(koordinate(3,6));
-	pushToStrip(koordinate(4,6));
-}
-
-void pushVIER() {
-	pushToStrip(koordinate(7,7));
-	pushToStrip(koordinate(8,7));
-	pushToStrip(koordinate(9,7));
-	pushToStrip(koordinate(10,7));
-}
-
-void pushSECHS() {
-	pushToStrip(koordinate(1,9));
-	pushToStrip(koordinate(2,9));
-	pushToStrip(koordinate(3,9));
-	pushToStrip(koordinate(4,9));
-	pushToStrip(koordinate(5,9));
-}
-
-void pushSIEBEN() {
-	pushToStrip(koordinate(5,5));
-	pushToStrip(koordinate(6,5));
 	pushToStrip(koordinate(7,5));
 	pushToStrip(koordinate(8,5));
 	pushToStrip(koordinate(9,5));
 	pushToStrip(koordinate(10,5));
 }
 
-void pushACHT() {
+void pushDREI() {
+	pushToStrip(koordinate(0,6));
+	pushToStrip(koordinate(1,6));
+	pushToStrip(koordinate(2,6));
+	pushToStrip(koordinate(3,6));
+}
+
+void pushVIER() {
+	pushToStrip(koordinate(7,6));
+	pushToStrip(koordinate(8,6));
+	pushToStrip(koordinate(9,6));
+	pushToStrip(koordinate(10,6));
+}
+
+void pushSECHS() {
+	pushToStrip(koordinate(0,7));
+	pushToStrip(koordinate(1,7));
+	pushToStrip(koordinate(2,7));
+	pushToStrip(koordinate(3,7));
+	pushToStrip(koordinate(4,7));
+}
+
+void pushSIEBEN() {
+	pushToStrip(koordinate(0,8));
 	pushToStrip(koordinate(1,8));
 	pushToStrip(koordinate(2,8));
 	pushToStrip(koordinate(3,8));
 	pushToStrip(koordinate(4,8));
+	pushToStrip(koordinate(5,8));
+}
+
+void pushACHT() {
+	pushToStrip(koordinate(7,7));
+	pushToStrip(koordinate(8,7));
+	pushToStrip(koordinate(9,7));
+	pushToStrip(koordinate(10,7));
 }
 
 void pushNEUN() {
-	pushToStrip(koordinate(3,7));
-	pushToStrip(koordinate(4,7));
-	pushToStrip(koordinate(5,7));
-	pushToStrip(koordinate(6,7));
+	pushToStrip(koordinate(3,9));
+	pushToStrip(koordinate(4,9));
+	pushToStrip(koordinate(5,9));
+	pushToStrip(koordinate(6,9));
 }
 
 void pushZEHN() {
-	pushToStrip(koordinate(5,8));
-	pushToStrip(koordinate(6,8));
-	pushToStrip(koordinate(7,8));
-	pushToStrip(koordinate(8,8));
+	pushToStrip(koordinate(0,9));
+	pushToStrip(koordinate(1,9));
+	pushToStrip(koordinate(2,9));
+	pushToStrip(koordinate(3,9));
 }
 
 void pushELF() {
-	pushToStrip(koordinate(0,7));
-	pushToStrip(koordinate(1,7));
-	pushToStrip(koordinate(2,7));
+	pushToStrip(koordinate(5,4));
+	pushToStrip(koordinate(6,4));
+	pushToStrip(koordinate(7,4));
 }
 
 void pushUHR() {
