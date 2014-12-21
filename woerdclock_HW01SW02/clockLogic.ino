@@ -4,6 +4,20 @@ void clockLogic() {
 		waitUntilClock = millis();
                 #if RTCLOCK
 		DateTime now = RTC.now();
+                #if DEBUG
+                        Serial.print(now.year(), DEC);
+                        Serial.print('/');
+                        Serial.print(now.month(), DEC);
+                        Serial.print('/');
+                        Serial.print(now.day(), DEC);
+                        Serial.print(' ');
+                        Serial.print(now.hour(), DEC);
+                        Serial.print(':');
+                        Serial.print(now.minute(), DEC);
+                        Serial.print(':');
+                        Serial.print(now.second(), DEC);
+                        Serial.println();
+                #endif
                 if(testMinutes != now.minute() || testHours != now.hour() || dhtaktion) {
 			dhtaktion = false;    //dht not in aktion 
                         testMinutes = now.minute();
@@ -12,6 +26,7 @@ void clockLogic() {
 			timeToStrip(testHours, testMinutes);
 			//displayStrip(defaultColor);
                         displayStrip(LEDcolorR, LEDcolorG, LEDcolorB);
+                        
 		}
                 #endif
                 #if DCFMODUL && !RTCLOCK

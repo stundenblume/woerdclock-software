@@ -108,11 +108,11 @@ void pushSET_C()  {
 
 #if BUTTON || CONFIGBUTTON
 boolean alreadyCalibrated(){
-  hButtonValue=EEPROM.read(1)*4;
-  mButtonValue=EEPROM.read(2)*4;
-  okButtonValue=EEPROM.read(3)*4;
+  dButtonValue=EEPROM.read(1)*4;
+  okButtonValue=EEPROM.read(2)*4;
+  uButtonValue=EEPROM.read(3)*4;
 
-  if (hButtonValue*okButtonValue*mButtonValue!=0) return true;
+  if (uButtonValue*okButtonValue*dButtonValue!=0) return true;
   else return false;
 }
 #endif

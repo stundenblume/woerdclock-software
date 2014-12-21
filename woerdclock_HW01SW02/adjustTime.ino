@@ -16,18 +16,16 @@ void adjustTime(){
       h++;
       if (h>=24) h=0;
       break;
-
-      // button 3, add one minute, if it is bigger than 59, set it back to 0
+     // button 2, the user is ready 
     case 2:
+      ok = true;
+      break;
+      // button 3, add one minute, if it is bigger than 59, set it back to 0
+    case 3:
       timeExtension = TIMEEXTENSION;
       start = millis();
       m++;
       if (m>=60) m=0;
-      break;
-
-      // button 2, the user is ready
-    case 3:
-      ok = true;
       break;
     }
 
@@ -53,9 +51,9 @@ void adjustTime(){
 byte whichButtonPressed(int val){
   byte button;
   
-  if (val > 10 && val < (mButtonValue - TOLLERANCE)) button = 1;          //mButtonValue is befor read from EEPROM, TOLLARANCE = 10 
-  else if (val > 10 && val < mButtonValue + TOLLERANCE) button = 2;
-  else if (val > 10 && val < okButtonValue + TOLLERANCE) button = 3;
+  if (val > 10 && val < (dButtonValue + TOLLERANCE)) button = 1;          //mButtonValue is befor read from EEPROM, TOLLARANCE = 10 
+  else if (val > 10 && val < okButtonValue + TOLLERANCE) button = 2;
+  else if (val > 10 && val < uButtonValue + TOLLERANCE) button = 3;
   else button = 4;
 
   return button; // return the number from wich button is pressed

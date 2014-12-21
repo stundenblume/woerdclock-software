@@ -195,6 +195,7 @@ void serial_interprete()
           LEDcolorG = (double) atof(cmd[2]);
           LEDcolorB = (double) atof(cmd[3]);
         }
+        FastLED.show();
       break;
 
       case  7: //glc = get_led_color
@@ -225,6 +226,7 @@ void serial_interprete()
       
       case 10: //sled = set_led with a color
           leds[atoi(cmd[1])] = CRGB(atoi(cmd[2]), atoi(cmd[3]), atoi(cmd[4]));
+          FastLED.show();
       break;
 /* Before the color option was integrated, only on or off
       case 10: //sled = set_led on/off
@@ -265,7 +267,7 @@ void serial_interprete()
  */
 
       case 12: //srtc = set_real_time_clock
-        timestamp=atoi(cmd[1]);
+        timestamp=atol(cmd[1]);
       break;
 
       #if DHT11
@@ -285,7 +287,12 @@ void serial_interprete()
       case 15: //mode = set a mode
         displayMode=atoi(cmd[1]);
       break;
-        
+      
+      case 16: //gmod = get a mode
+        write_serial_cmd(j);
+        write_serial(displayMode);
+        write_serial_str(cmdbreak);
+      break;         
         
       default: 
         if(strlen(cmd[0]))
