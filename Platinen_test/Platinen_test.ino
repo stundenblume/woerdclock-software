@@ -4,15 +4,15 @@
 
 //----MODULE----//
 #define DHTMOD 1
-#define RTCCLK 0
-#define MIC 0
+#define RTCCLK 1
+#define MICMOD 1
 #define LDRMOD 1
 
 //----PINS----//
 
 #define DHTPIN 6     // what pin we're connected to
-#define MICPIN 0
-#define LDRPIN A6
+#define MICPIN A1
+#define LDRPIN A0
 #define BUTTONS 4
 
 
@@ -90,11 +90,11 @@ void loop() {
     Serial.print("Datum: ");
     
     Serial.print(now.day(), DEC);
-    Serial.print(' ');
+    Serial.print('.');
     Serial.print(now.month(), DEC);
-    Serial.print('/');
+    Serial.print('.');
     Serial.print(now.year(), DEC);
-    Serial.println('/');
+    Serial.println('.');
     
     Serial.print("Zeit: ");
     
@@ -137,12 +137,19 @@ void loop() {
   
   Serial.println("--> LDR Module <--");
   int LDRReading = analogRead(LDRPIN);
-  Serial.println("Helligkeit: "); 
+  Serial.print("Helligkeit: "); 
   Serial.println(LDRReading);
+  Serial.println();
   
   #endif
   
   #if MICMOD
+  
+  Serial.println("--> MIC Module <--");
+  int MICReading = analogRead(MICPIN);
+  Serial.print("Sound: "); 
+  Serial.println(MICReading);
+  Serial.println();
   
   #endif
   
