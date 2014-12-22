@@ -172,10 +172,12 @@ const char cmdStrCon[cmdCount][paraLength]=
     "srtc" }
   ,{
     "gtem" }
+  ,{  
+    "ghum"}
   ,{
     "smod"}
   ,{
-    "ghum"}
+    "gmod"}
 };
 char       cmdStr[paraCount*paraLength+paraCount+1]; //buffer for complete line of comand and parameter
 int        cmdStrIn=0;                               //index for the cmdStr 

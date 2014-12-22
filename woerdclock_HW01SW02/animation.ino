@@ -15,7 +15,7 @@ void animation() {
 //		pushToStrip(41); pushToStrip(61);
 //		pushToStrip(59);
 //		displayStrip(CRGB::Red);
-//		waitUntilHeart += oneSecondDelay;
+		waitUntilHeart += oneSecondDelay;
 	//}
           random16_add_entropy( random());
 
@@ -31,27 +31,23 @@ void Fire2012()
   static byte heat[NUM_LEDS];
 
   // Step 1.  Cool down every cell a little
-    for( int y = 9; y > 0; y--) {
-       for (int x = 0; x < 11; x++){
-        heat[koordinate(x,y)] = qsub8( heat[koordinate(x,y)],  random8(0, ((COOLING * 10) / NUM_LEDS) + 2));
-      }
+    for( int i = 0; i < NUM_LEDS; i++) {
+      heat[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / NUM_LEDS) + 2));
     }
   
     // Step 2.  Heat from each cell drifts 'up' and diffuses a little
-    for( int w= 0; w < 9; w++){
-      for( int v= 11; v >= 0; v--) {
-        heat[koordinate(v,w)] = (heat[koordinate(v,w+1)] + heat[koordinate(v,w+1)] + heat[koordinate(v,w+1)] ) / 3;
-      }
+    for( int k= NUM_LEDS - 1; k >= 2; k--) {
+      heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
     }
+    
     // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
     if( random8() < SPARKING ) {
-      int z = random8(2);
-      int r = random8(10);
-      heat[z] = qadd8( heat[koordinate(r,z)], random8(160,255) );
+      int y = random8(7);
+      heat[y] = qadd8( heat[y], random8(160,255) );
     }
 
     // Step 4.  Map from heat cells to LED colors
-    for( int j = 4; j < NUM_LEDS; j++) {
+    for( int j = 0; j < NUM_LEDS; j++) {
         leds[j] = HeatColor( heat[j]);
     }
 }

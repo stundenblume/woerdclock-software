@@ -72,7 +72,7 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define FRAMES_PER_SECOND 60
 #define COOLING  55
 #define SPARKING 120
-long BAUDRATE = 57600; // default Baudrate for serial communication
+long BAUDRATE = 9600; // default Baudrate for serial communication
  
 //PIN defines
 #define STRIP_DATA_PIN 8
@@ -141,7 +141,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 */
 const byte  paraCount = 5;                            // max quantity of parameter (incl. command) per line    slc = NR,r,g,b
 const byte  paraLength = 11;                           // max length per parameter/command (-1)                 help,show
-const byte  cmdCount = 17;                            // quantity of possible commands                        show to slcp
+const byte  cmdCount = 16;                            // quantity of possible commands                        show to slcp
 const char cmdStrCon[cmdCount][paraLength]=
 {
   {
@@ -173,9 +173,9 @@ const char cmdStrCon[cmdCount][paraLength]=
   ,{
     "gtem" }
   ,{
-    "smod"}
-  ,{
     "ghum"}
+  ,{
+    "smod"}
 };
 char       cmdStr[paraCount*paraLength+paraCount+1]; //buffer for complete line of comand and parameter
 int        cmdStrIn=0;                               //index for the cmdStr 
@@ -185,8 +185,7 @@ char       cmd[paraCount][paraLength];               //arry with command and par
   #if USBPORT0 || BLUETOOTH0 || BLUETOOTH1 || BLUETOOTH2 || WLAN
   
     /* Welcome + help text */
-    const char strwelcome[]  = "\nWelcome to WördClock Controller Interface  \n\r version 0.8";
-    /*
+    const char strwelcome[]  = "\nWelcome to WördClock Controller Interface  \n\r version 0.72";
     const char strhelp1[] = 
     "\n Possible commands are:"
     "\n\r help           help text"
@@ -200,16 +199,15 @@ char       cmd[paraCount][paraLength];               //arry with command and par
     const char strhelp2[] =
     "\n\r slcp           store led color permanent"
     "\n\r glcp           get permanent led color"
-    "\n\r sled=No,R,G,B set led by number with RGB color code"
+    "\n\r sled=0-114,0/1 set led by number off/on"
     "\n\r srtc           set unix time stamp for clock"
     "\n\r grtc           get unix time stamp and time from clock";
   
     const char strhelp3[] =
     "\n\r gtem           get temperature"
     "\n\r ghum           get humidity"
-    "\n\r smode          set the mode";
-    "\n\r gmode          get the mode\n";
-    */
+    "\n\r mode           set the mode\n";
+  
     const char strerror[] = "error";
     const char paramseperator = ',';
     const char cmdbreak = '\n';
@@ -466,7 +464,6 @@ long waitUntilOff = 0;
 long waitUntilHeart = 0;
 
 boolean dhtaktion = false;       //dht in aktion marker
-boolean colorchange = false;     //Color Change over Serial
 
 //****************************Debug Config**********************
 #if DEBUG
@@ -625,6 +622,10 @@ void loop() {
         selectModus();
     #endif
     
+    #if DHT11
+        dhtRead();
+    #endif
+    
     /* All in one serial communication function to interprete command from any serial port*/
     #if GENSERIAL
     serial_com();
@@ -660,33 +661,22 @@ void loop() {
 			off();
 			break;
 		case 1:              //FAST
-			animation();           
+			//fastTest();           
 			break;
 		case 2:              //DISCO
-                        #if MIC
+			#if MIC
                         disco();
                         #endif
-                        clockLogiColor(); //CLOCK with Color Change alternativ Modus for no MIC Board
-                        #if DHT11
-                            dhtRead();
-                        #endif
 			break;
-		case 3:               //CLOCK with temp and humidity		
-                        clockLogic();
-                        #if DHT11
-                            dhtRead();
-                        #endif
+		case 3:               //ANIM
+			animation();
 			break;
-		case 4:                //CLOCK only
+		case 4:                //CLOCK
 			clockLogic();
 			break;
                 case 5:                
-			#if GENSERIAL
-                          serial_com();
-                        #endif
+			clockLogiColor(); //CLOCK with Color Change
 			break;
-                case 6:
-                        break;
 		default:
                         clockLogic();
 			break;
