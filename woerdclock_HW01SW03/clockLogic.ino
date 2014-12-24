@@ -19,7 +19,8 @@ void clockLogic() {
                         Serial.println();
                 #endif
                 if(testMinutes != now.minute() || testHours != now.hour() || dhtaktion || colorchange) {
-			dhtaktion = false;    //dht not in aktion 
+			dhtaktion = false;    //dht not in aktion
+                        clockaktion = true;    //Clock in aktion
                         colorchange = false;  //color not change over serial
                         testMinutes = now.minute();
 		  	testHours = now.hour();
@@ -33,6 +34,7 @@ void clockLogic() {
                 #if DCFMODUL && !RTCLOCK
                 if(testMinutes != minute() || testHours != hour() || dhtaktion || colorchange) {
 			dhtaktion = false;    //dht not in aktion
+                        clockaktion = true;    //Clock in aktion
                         colorchange = false;  //color not change over serial 
                         testMinutes = minute();
 		  	testHours = hour();
@@ -52,6 +54,7 @@ void clockLogiColor() {
 		DEBUG_PRINT("Uhrzeit Mode Color");
 		waitUntilClock = millis();
 		DateTime now = RTC.now();
+                clockaktion = true;    //Clock in aktion
                 if(testMinutes != now.minute() || testHours != now.hour() || dhtaktion) {
 			dhtaktion = false;    //dht not in aktion 
                         testMinutes = now.minute();

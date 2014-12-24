@@ -40,7 +40,7 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 //Which Modules are installed?
 #define CONFIGBUTTON 0 //Config Buttons and adjust Time, SET CONFIGBUTTON or BUTTON 
 #define RTCLOCK 1     //Module Real Time Clock
-#define BUTTON 0      //Button are used  SET CONFIGBUTTON or BUTTON 
+#define BUTTON 1      //Button are used  SET CONFIGBUTTON or BUTTON 
 #define LDR 1         //LDR is used
 #define GENSERIAL 1    //Gen Serial
 #define BLUETOOTH0 1   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
@@ -69,9 +69,11 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #include <EEPROM.h>
 //LED defines
 #define NUM_LEDS 114
+#define ANIMLEDS 100    //LED for Animation 
+static byte heatanim[ANIMLEDS];
 #define FRAMES_PER_SECOND 60
 #define COOLING  55
-#define SPARKING 120
+#define SPARKING 80
 long BAUDRATE = 57600; // default Baudrate for serial communication
  
 //PIN defines
@@ -469,6 +471,7 @@ long waitUntilHeart = 0;
 
 boolean dhtaktion = false;       //dht in aktion marker
 boolean colorchange = false;     //Color Change over Serial
+boolean clockaktion = true;    //Clock in aktion marker
 
 //****************************Debug Config**********************
 #if DEBUG
@@ -515,10 +518,6 @@ void setup() {
         // following line sets the RTC to the date & time this sketch was compiled
         RTC.adjust(DateTime(__DATE__, __TIME__));
         DEBUG_PRINT("No RTC");
-//        resetAndBlack();
-//	pushToStrip(0);
-//        pushToStrip(3);
-//        displayStrip(CRGB::Red);
         }	
     #endif
 //***************Setup BUTTON CONFIG***************************
@@ -687,8 +686,6 @@ void loop() {
                           serial_com();
                         #endif
 			break;
-                case 6:
-                        break;
 		default:
                         clockLogic();
 			break;

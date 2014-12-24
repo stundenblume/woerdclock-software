@@ -43,21 +43,21 @@ void selectModus(){
                           //writeChar('0');
                           delay(150);
   			break;
-  		case 1:              //FAST
+  		case 1:              //Anim
                           resetAndBlack();
   	                pushToStrip(1);
                           displayStrip(CRGB::Green);
   			//writeChar('1');
                           delay(150);           
   			break;
-  		case 2:              //DISCO
+  		case 2:              //ClockColor
                           resetAndBlack();
   	                pushToStrip(2);
                           displayStrip(CRGB::Red);
   			//writeChar('2');
                           delay(150);
   			break;
-  		case 3:               //ANIM
+  		case 3:               //Clock with Temp
                           resetAndBlack();
   	                pushToStrip(3);
                           displayStrip(CRGB::Yellow);

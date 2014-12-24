@@ -1,24 +1,11 @@
 void animation() {
-	//if(millis() >= waitUntilHeart) {
-//		autoBrightnessEnabled = false;
-//		DEBUG_PRINT("showing heart");
-//		waitUntilHeart = millis();
-//		resetAndBlack();
-//		pushToStrip(29); pushToStrip(30); pushToStrip(70); pushToStrip(89);
-//		pushToStrip(11); pushToStrip(48); pushToStrip(68); pushToStrip(91);
-//		pushToStrip(7); pushToStrip(52); pushToStrip(107);
-//		pushToStrip(6); pushToStrip(106);
-//		pushToStrip(5); pushToStrip(105);
-//		pushToStrip(15); pushToStrip(95);
-//		pushToStrip(23); pushToStrip(83);
-//		pushToStrip(37); pushToStrip(77);
-//		pushToStrip(41); pushToStrip(61);
-//		pushToStrip(59);
-//		displayStrip(CRGB::Red);
-//		waitUntilHeart += oneSecondDelay;
-	//}
+          if (clockaktion == true){
+              clockaktion = false;    //Clock not aktion
+              resetAndBlack();
+          }
+          
           random16_add_entropy( random());
-
+          
           Fire2012(); // run simulation frame
           
           FastLED.show(); // display this frame
@@ -27,31 +14,43 @@ void animation() {
 
 void Fire2012()
 {
-// Array of temperature readings at each simulation cell
-  static byte heat[NUM_LEDS];
+  // Array of temperature readings at each simulation cell
+  //static byte heatanim[ANIMLEDS];
+  //static byte heat[ANIMLEDS];
 
   // Step 1.  Cool down every cell a little
-    for( int y = 9; y > 0; y--) {
-       for (int x = 0; x < 11; x++){
-        heat[koordinate(x,y)] = qsub8( heat[koordinate(x,y)],  random8(0, ((COOLING * 10) / NUM_LEDS) + 2));
-      }
+    for( int i = 0; i < ANIMLEDS; i++) {
+      heatanim[i] = qsub8( heatanim[i],  random8(0, ((COOLING * 10) / ANIMLEDS) + 2));
     }
   
     // Step 2.  Heat from each cell drifts 'up' and diffuses a little
-    for( int w= 0; w < 9; w++){
-      for( int v= 11; v >= 0; v--) {
-        heat[koordinate(v,w)] = (heat[koordinate(v,w+1)] + heat[koordinate(v,w+1)] + heat[koordinate(v,w+1)] ) / 3;
-      }
+    for( int k= ANIMLEDS - 1; k >= 2; k--) {
+      heatanim[k] = (heatanim[k - 1] + heatanim[k - 2] + heatanim[k - 2] ) / 3;
     }
+    
     // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
     if( random8() < SPARKING ) {
-      int z = random8(2);
-      int r = random8(10);
-      heat[z] = qadd8( heat[koordinate(r,z)], random8(160,255) );
+      int y = random8(7);
+      heatanim[y] = qadd8( heatanim[y], random8(160,255) );
     }
 
     // Step 4.  Map from heat cells to LED colors
-    for( int j = 4; j < NUM_LEDS; j++) {
-        leds[j] = HeatColor( heat[j]);
-    }
+    for( int j = 0; j < ANIMLEDS; j++) {
+        leds[animath(j)] = HeatColor( heatanim[j]);
+    }   
+    
+}
+
+int  animath (int led){
+ int x = 0;
+ int y = 0;
+
+   x = led%10;  //Zeile
+   x = 9-x;    //Umrechnung unten anfangen
+   y = led/10;  //Spalte
+   y =  9-y;   //Umrechnung da spiegeverkehrt
+
+ int newled = koordinate(x,y);
+ return newled;
+
 }
