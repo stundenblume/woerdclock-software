@@ -22,6 +22,15 @@
 ///////////////////////////
 
 void showTime(){
+  for(byte i=0;i<WS2812BCOUNT;i++) leds[i] = CRGB::Black;
+
+  Serial.print(h);
+  Serial.print(":");
+  Serial.print(m);
+  Serial.print(":");
+  Serial.print(s);
+  Serial.print(" ");
+
   // show: es ist
   setItIs();
 
@@ -42,12 +51,10 @@ void showTime(){
 void setH(){
   byte H=h;
 
-  if (m>39) H++;
+  if (m>24) H++;
+  if (H>12) H=1;
 
   switch(H){
-  case 0:
-    set12();
-    break;
   case 1:
     set1();
     break;
@@ -81,6 +88,9 @@ void setH(){
   case 11:
     set11();
     break;
+  default:
+    set12();
+    break;
   } 
 }
 
@@ -110,17 +120,14 @@ void setM(){
     set5(); 
     setTo();
     setHalf();
-    setPast();
   }
   else if (m<35){
     setHalf(); 
-    setPast();
   }
   else if (m<40){
     set5(); 
     setPast();
     setHalf();
-    setPast();
   }
   else if (m<45){
     set20();
@@ -138,6 +145,7 @@ void setM(){
     set5(); 
     setTo();
   }
+  for (int i=0;i<m%5 && m%5>0;i++) leds[i] = CRGB::White;
 }
 
 // Logic to switch seconds
@@ -152,35 +160,30 @@ void setS(){
 ///////////////////////////////////
 
 void setQuater(){
-  //leds[11] = CRGB::White; //U
+  lightUp(2,4,10);
   Serial.print(" quater");
 }
 void setHalf(){
-  //leds[11] = CRGB::White; //U
+  lightUp(4,0,3);
   Serial.print(" half");
 }
 void setTo(){
-  //leds[11] = CRGB::White; //U
+  lightUp(3,0,2);
   Serial.print(" to");
 }
 void setPast(){
-  //leds[11] = CRGB::White; //U
+  lightUp(3,7,10);
   Serial.print(" past");
 }
 void setItIs(){
-  leds[14] = CRGB::White; //e
-  leds[15] = CRGB::White; //s
+  lightUp(0,0,1);
 
-  leds[35] = CRGB::White; //i
-  leds[54] = CRGB::White; //s
-  leds[55] = CRGB::White; //t
+  lightUp(0,3,5);
   Serial.print("it is");
 }
 
 void setUhr(){
-  leds[75] = CRGB::White; //U
-  leds[94] = CRGB::White; //h
-  leds[95] = CRGB::White; //r
+  lightUp(9,8,10);
   Serial.print(" o'clock");
 }
 
@@ -189,50 +192,51 @@ void setUhr(){
 ////////////////////////
 
 void set12(){
-  //leds[11] = CRGB::White; //U
+  lightUp(8,6,10);
   Serial.print(" twelve");
 }
 void set1(){
-  //leds[11] = CRGB::White; //U
+  lightUp(5,0,2);
   Serial.print(" one");
 }
 void set2(){
-  //leds[11] = CRGB::White; //U
+  lightUp(5,7,10);
   Serial.print(" two");
 }
 void set3(){
-  //leds[11] = CRGB::White; //U
+  lightUp(2,0,3);
   Serial.print(" three");
 }
 void set4(){
-  //leds[11] = CRGB::White; //U
+  lightUp(6,7,10);
   Serial.print(" four");
 }
 void set5H(){
-  //leds[11] = CRGB::White; //U
+  lightUp(4,7,10);
   Serial.print(" five*");
 }
 void set6(){
-  //leds[11] = CRGB::White; //U
+  lightUp(7,0,4);
   Serial.print(" six");
 }
 void set7(){
-  //leds[11] = CRGB::White; //U
+  lightUp(8,0,5);
   Serial.print(" seven");
 }
 void set8(){
-  //leds[11] = CRGB::White; //U
+  lightUp(7,7,10);
   Serial.print(" eight");
 }
 void set9(){
+  lightUp(9,3,6);
   Serial.print(" nine");
 }
 void set10H(){
-  //leds[11] = CRGB::White; //U
+  lightUp(9,0,3);
   Serial.print(" ten*");
 }
 void set11(){
-  //leds[11] = CRGB::White; //U
+  lightUp(4,5,7);
   Serial.print(" eleven");
 }
 
@@ -241,15 +245,17 @@ void set11(){
 /////////////////////////
 
 void set5(){
-  //leds[11] = CRGB::White; //U
+  lightUp(0,7,10);
   Serial.print(" five");
 }
 void set10(){
-  //leds[11] = CRGB::White; //U
+  lightUp(1,0,3);
   Serial.print(" ten");
 }
 void set20(){
-  //leds[11] = CRGB::White; //U
+  lightUp(1,4,10);
   Serial.print(" twenty");
 }
+
+
 

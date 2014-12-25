@@ -8,8 +8,9 @@
 
 RTC_DS1307 RTC;
 
-#define WS2812BPIN 10
-#define ANALOGPIN 3
+#define TIMESCALE 50 // 1 for normal clock mode
+
+#define WS2812BPIN 8
 
 #define WS2812BCOUNT 114
 
@@ -24,16 +25,14 @@ CRGB leds[WS2812BCOUNT];
 
 void setup()  {
   Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for Leonardo only
-  }
-  Serial.println("Woerdclock Start");
-  
+
   // sanity check delay - allows reprogramming if accidently blowing power w/leds
   delay(2000);
-      FastLED.addLeds<WS2812B, WS2812BPIN, RGB>(leds, WS2812BCOUNT);
+  FastLED.addLeds<WS2812B, WS2812BPIN, RGB>(leds, WS2812BCOUNT);
 
-  selftest(100); // test all LEDs
+  Serial.println("Woerdclock Start");
+
+  selftest(50); // test all LEDs
 
   Wire.begin();
   RTC.begin();
@@ -54,13 +53,14 @@ void loop()  {
   // loop over and over again to show the current time
 
   //if (millis()-lastSecond >= 1000){
-  if (millis()-lastSecond >= 10){ // just for test reasons every 10ms instead of 1s, so the time will be 10times faster
+  if (millis()-lastSecond >= 1000/TIMESCALE){ // just for test reasons every 10ms instead of 1s, so the time will be 10times faster
     lastSecond=millis();
     calcTime();
   }
   showTime(); // show current time
-  delay (100); // wait a little, we don't need to update to often
+  delay (100/TIMESCALE); // wait a little, we don't need to update to often
 }
+
 
 
 

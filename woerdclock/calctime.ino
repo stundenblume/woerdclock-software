@@ -13,10 +13,11 @@ void calcTime(){
           h=now.hour();
           m=now.minute();
           s=now.second();     
-       }
+        }
       }
     }
     else m++;
   }
   else s++;
 }
+
