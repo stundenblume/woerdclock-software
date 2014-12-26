@@ -1,11 +1,11 @@
 //this function will calculate the current time
 
 void calcTime(){
-  if (s==59){
+  if (s>=59){
     s=0;
-    if (m==59){
+    if (m>=59){
       m=0;
-      if(h==23) h=0;
+      if(h>=11) h=0;
       else{
         h++;
         if (RTCpresent){

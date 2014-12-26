@@ -51,8 +51,8 @@ void showTime(){
 void setH(){
   byte H=h;
 
-  if (m>24) H++;
-  if (H>12) H=1;
+  if (m>=25) H++;
+  if (H>=13) H=1;
 
   switch(H){
   case 1:
@@ -196,8 +196,8 @@ void set12(){
   Serial.print(" twelve");
 }
 void set1(){
-  if(m<5)lightUp(5,0,3);
-  else lightUp(5,0,2);
+  if(m>=0 && m<5)lightUp(5,0,2);
+  else lightUp(5,0,3);
   Serial.print(" one");
 }
 void set2(){

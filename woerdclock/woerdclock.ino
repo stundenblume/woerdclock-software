@@ -33,7 +33,7 @@ boolean RTCpresent=false;
 
 unsigned long lastSecond;
 
-byte h=6, m=30, s=0;
+byte h=16, m=46, s=11;
 
 CRGB leds[WS2812BCOUNT];
 
@@ -66,8 +66,6 @@ void setup()  {
 
 void loop()  {
   // loop over and over again to show the current time
-
-  //if (millis()-lastSecond >= 1000){
   if (millis()-lastSecond >= 1000/TIMESCALE){ // just for test reasons every 10ms instead of 1s, so the time will be 10times faster
     lastSecond=millis();
     calcTime();
