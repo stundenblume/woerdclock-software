@@ -196,7 +196,8 @@ void set12(){
   Serial.print(" twelve");
 }
 void set1(){
-  lightUp(5,0,2);
+  if(m<5)lightUp(5,0,3);
+  else lightUp(5,0,2);
   Serial.print(" one");
 }
 void set2(){
@@ -256,6 +257,7 @@ void set20(){
   lightUp(1,4,10);
   Serial.print(" twenty");
 }
+
 
 
 

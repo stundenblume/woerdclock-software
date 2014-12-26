@@ -1,6 +1,21 @@
-/*
-
- */
+/*******************************************
+ *
+ * Name.......:  Wördclock
+ * Description:  This is a small scetch wich will light up your Wördclock with minimal Hardware.
+ * Author.....:  Sebastian Setz
+ * Version....:  0.1
+ * Date.......:  2014-12-26
+ * Project....:  http://woerdclock.com http://wördclock.de
+ * Contact....:  http://Sebastian.Setz.name
+ * License....:  This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
+ * Credit.....:  function "koordinate()", Jan S. (https://github.com/khold1996)
+                 FastLED library, https://github.com/FastLED/FastLED
+                 RTC library, adafruit https://github.com/adafruit/RTClib
+ * Keywords...:  arduino, time, clock, wordclock
+ * History....:  2014-12-26 V0.1 - release
+ *               
+ ********************************************/
+ 
 #include <Wire.h>
 #include "RTClib.h"
 #include "FastLED.h"
@@ -8,7 +23,7 @@
 
 RTC_DS1307 RTC;
 
-#define TIMESCALE 50 // 1 for normal clock mode
+#define TIMESCALE 1 // 1 for normal clock mode
 
 #define WS2812BPIN 8
 
@@ -18,7 +33,7 @@ boolean RTCpresent=false;
 
 unsigned long lastSecond;
 
-byte h=4, m=4, s=4;
+byte h=6, m=30, s=0;
 
 CRGB leds[WS2812BCOUNT];
 
@@ -56,10 +71,10 @@ void loop()  {
   if (millis()-lastSecond >= 1000/TIMESCALE){ // just for test reasons every 10ms instead of 1s, so the time will be 10times faster
     lastSecond=millis();
     calcTime();
+    showTime(); // show current time
   }
-  showTime(); // show current time
-  delay (100/TIMESCALE); // wait a little, we don't need to update to often
 }
+
 
 
 
