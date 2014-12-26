@@ -8,6 +8,7 @@
 
 // the setup routine runs once when you press reset:
 void setup() {
+  delay(2222);
   // initialize serial communication at 9600 bits per second:
   Serial.begin(9600);
 }
@@ -15,7 +16,7 @@ void setup() {
 // the loop routine runs over and over again forever:
 void loop() {
   // read the input on analog pin 0:
-  int sensorValue = analogRead(A1); // For Wördclock Hardware V01
+  int sensorValue = analogRead(A6); // For Wördclock Hardware V01
   // print out the value you read:
   Serial.println(sensorValue);
   delay(1);        // delay in between reads for stability

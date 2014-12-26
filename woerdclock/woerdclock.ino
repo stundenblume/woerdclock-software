@@ -33,7 +33,7 @@ boolean RTCpresent=false;
 
 unsigned long lastSecond;
 
-byte h=16, m=46, s=11;
+byte h=11, m=11, s=11;
 
 CRGB leds[WS2812BCOUNT];
 

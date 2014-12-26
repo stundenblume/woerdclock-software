@@ -5,7 +5,7 @@ void calcTime(){
     s=0;
     if (m>=59){
       m=0;
-      if(h>=11) h=0;
+      if(h>=23) h=0;
       else{
         h++;
         if (RTCpresent){

@@ -1,6 +1,7 @@
 #include <DHT11.h>
-int pin=11; // Wördclock hardware V01
-DHT11 dht11(pin); 
+
+DHT11 dht11(6); // Wördclock hardware V02
+
 void setup()
 {
    Serial.begin(9600);

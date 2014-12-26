@@ -6,6 +6,7 @@
 RTC_DS1307 RTC;
 
 void setup () {
+  delay (2222);
     Serial.begin(57600);
     Wire.begin();
     RTC.begin();

@@ -51,8 +51,9 @@ void showTime(){
 void setH(){
   byte H=h;
 
-  if (m>=25) H++;
-  if (H>=13) H=1;
+  if (H>12)H=H-12; // Convert to 12h format
+  if (m>=25) H++; // if the spelling flips from 20 minutes past xx to 5 minutes to half yy
+  if (H>12) H=1; // handle the overflow from 12 to 1 o'clock
 
   switch(H){
   case 1:
@@ -257,6 +258,7 @@ void set20(){
   lightUp(1,4,10);
   Serial.print(" twenty");
 }
+
 
 
 
