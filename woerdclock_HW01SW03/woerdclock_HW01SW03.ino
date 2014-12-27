@@ -444,7 +444,6 @@ B00001111
   //#include <util/crc16.h>
   //#include <util/parity.h>
   #include <avr/eeprom.h>
-  //#include <avr/pgmspace.h>
 #endif
 
 //****************************Default Config********************
@@ -457,18 +456,17 @@ byte LEDcolorR = EEPROM.read(5); // this is a dummy variable for the LED color r
 byte LEDcolorG = EEPROM.read(6); // this is a dummy variable for the LED color green
 byte LEDcolorB = EEPROM.read(7); // this is a dummy variable for the LED color blue
 uint8_t colorIndex = 0;
-boolean autoBrightnessEnabled = true;
-byte brightness = 50;
+boolean autoBrightnessEnabled = true;    //true and the LDR is aktiv or false and the LDR is not aktiv (its the same as no LDR
+byte brightness = 50;                    //default brightness without LDR
 
 //multitasking helper
 const long oneSecondDelay = 1000;
 const long halfSecondDelay = 500;
 
-//long waitUntilParty = 0;
-long waitUntilOff = 0;
-//long waitUntilFastTest = 0;
-long waitUntilHeart = 0;
 
+long waitUntilOff = 0;
+
+//Marker to find out the correct Modus or refresh states
 boolean dhtaktion = false;       //dht in aktion marker
 boolean colorchange = false;     //Color Change over Serial
 boolean clockaktion = true;    //Clock in aktion marker
@@ -552,7 +550,7 @@ void setup() {
      #if BUTTON     
         selftest(100);                                   // test all LEDs and write "HALLO" 
         boolean calibOK = alreadyCalibrated();           // Check if there is was already a calibration of the buttons         
-        if (!calibOK){
+        if (!calibOK){                                  
         DEBUG_PRINT(F("Button not calibrated"));
         }
      #endif
@@ -614,9 +612,9 @@ void setup() {
 }
 
 void loop() {
-    #if IRRESV	
-        doIRLogic();
-    #endif
+//    #if IRRESV	
+//        doIRLogic();
+//    #endif
 
     #if LDR	
         doLDRLogic();
@@ -630,7 +628,7 @@ void loop() {
     #if GENSERIAL
     serial_com();
       #if RTCLOCK
-      if (timestamp!=timestampold){
+      if (timestamp!=timestampold){        //if the timestap is new adjust the RTC
       timestamp += 3600;
       timestampold = timestamp;
       DEBUG_PRINT(F("Time is "));
@@ -644,7 +642,7 @@ void loop() {
     
     #if DCFMODUL
 
-    time_t DCFtime = DCF.getTime(); // Check if new DCF77 time is available
+    time_t DCFtime = DCF.getTime(); // Check if new DCF77 time is available and adjust the RTC
         if (DCFtime!=0)
           {
               DEBUG_PRINT(F("Time is updated"));
@@ -657,31 +655,31 @@ void loop() {
      #endif
     //Select Displaymode
 	switch(displayMode) {
-		case 0:              //ONOFF
+		case 0:                  //ONOFF
 			off();
 			break;
-		case 1:              //FAST
+		case 1:                  //Fire Animation in a 10x10 Matrix
 			animation();           
 			break;
-		case 2:              //DISCO
+		case 2:                  //Disco or ColorClockmod
                         #if MIC
                         disco();
                         #endif
-                        clockLogiColor(); //CLOCK with Color Change alternativ Modus for no MIC Board
+                        clockLogiColor(); //CLOCK with Color Change and DHT, a alternativ Modus for Boards without MIC (commit if Mic used)
                         #if DHT11
                             dhtRead();
                         #endif
 			break;
-		case 3:               //CLOCK with temp and humidity		
+		case 3:                   //CLOCK with temp and humidity		
                         clockLogic();
                         #if DHT11
                             dhtRead();
                         #endif
 			break;
-		case 4:                //CLOCK only
+		case 4:                    //CLOCK only
 			clockLogic();
 			break;
-                case 5:                
+                case 5:                    //Modus for Draw and game over Serialcom      
 			#if GENSERIAL
                           serial_com();
                         #endif
@@ -690,9 +688,7 @@ void loop() {
                         clockLogic();
 			break;
 	}
-
 }
-
 //***********************DISPLAY MODES OFF**********************
 void off() {
 	if(millis() >= waitUntilOff) {
@@ -704,7 +700,7 @@ void off() {
 	}
 }
 //*************************Led Function**********************
-CRGB prevColor() {
+CRGB prevColor() {                    //used for Color Clock Mod
 	if(colorIndex > 0) {
 		colorIndex--;
 	}
@@ -713,7 +709,7 @@ CRGB prevColor() {
 	}
 	return getColorForIndex();
 }
-CRGB nextColor() {
+CRGB nextColor() {                    //used for Color Clock Mod
 	if(colorIndex < 9) {
 		colorIndex++;
 	}
@@ -723,7 +719,7 @@ CRGB nextColor() {
 	return getColorForIndex();
 }
 
-CRGB getColorForIndex() {
+CRGB getColorForIndex() {              //used for Color Clock Mod
 	switch(colorIndex) {
 		case 0:
 			return CRGB::White;
@@ -751,44 +747,44 @@ CRGB getColorForIndex() {
 	}
 }
 
-void pushToStrip(int ledId) {
+void pushToStrip(int ledId) {                       //used a Array to now witch LED is on 
 	strip[stackptr] = ledId;
 	stackptr++;
 }
 
-void resetAndBlack() {
+void resetAndBlack() {                              //all LED set Black
 	resetStrip();
 	for(int i = 0; i<NUM_LEDS; i++) {
 		leds[i] = CRGB::Black;
 	}
 }
 
-void resetStrip() {
+void resetStrip() {                                  //reset Array for next use 
 	stackptr = 0;
 	for(int i = 0; i<NUM_LEDS; i++) {
 		strip[i] = 0;
 	}
 }
 
-void displayStripRandomColor() {
+void displayStripRandomColor() {                    //Random Color for Led
 	for(int i = 0; i<stackptr; i++) {
 		leds[strip[i]] = CHSV(random(0, 255), 255, 25);
 	}
 	FastLED.show();
 }
 
-void displayStrip() {
+void displayStrip() {                                //set Color defaultColor
 	displayStrip(defaultColor);
 }
 
-void displayStrip(CRGB colorCode) {
+void displayStrip(CRGB colorCode) {                  //set Color over variable from FastLED
 	for(int i = 0; i<stackptr; i++) {
 		leds[strip[i]] = colorCode;
 	}
 	FastLED.show();
 }
 
-void displayStrip(byte red, byte green, byte blue) {
+void displayStrip(byte red, byte green, byte blue) { //set Color over RGB Code
 	for(int i = 0; i<stackptr; i++) {
 		leds[strip[i]] = CRGB( red, green, blue);
 	}

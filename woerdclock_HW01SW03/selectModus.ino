@@ -8,7 +8,6 @@ void selectModus(){
       int okButtonpressed = whichButtonPressed(analogRead(ANALOGPIN));
       if(okButtonpressed == 2){
         modus = true;
-        //okButtonpressed = 0;
       }
     }
   }
@@ -19,14 +18,14 @@ void selectModus(){
     while(millis()-start<AUTOENDTIME){ // if the jumper is open and 5 seconds not over and ok not pressed, this function is in action
       modus = false;
       switch (whichButtonPressed(analogRead(ANALOGPIN))){ // check which button is pressed
-      case 1:
+      case 1://next Mod
         start = millis();
         displayMode++;
         if (displayMode>=5) displayMode=0;
         break;
   
         
-      case 3:
+      case 3://prev Mod
         start = millis();
         displayMode--;
         if (displayMode<0) displayMode=4;
@@ -50,7 +49,7 @@ void selectModus(){
   			//writeChar('1');
                           delay(150);           
   			break;
-  		case 2:              //ClockColor
+  		case 2:              //ClockColor or Mic 
                           resetAndBlack();
   	                pushToStrip(2);
                           displayStrip(CRGB::Red);
