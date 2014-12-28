@@ -9,13 +9,13 @@
  * Contact....:  http://Sebastian.Setz.name
  * License....:  This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
  * Credit.....:  function "koordinate()", Jan S. (https://github.com/khold1996)
-                 FastLED library, https://github.com/FastLED/FastLED
-                 RTC library, adafruit https://github.com/adafruit/RTClib
+ * FastLED library, https://github.com/FastLED/FastLED
+ * RTC library, adafruit https://github.com/adafruit/RTClib
  * Keywords...:  arduino, time, clock, wordclock
  * History....:  2014-12-26 V0.1 - release
  *               
  ********************************************/
- 
+
 #include <Wire.h>
 #include "RTClib.h"
 #include "FastLED.h"
@@ -45,7 +45,7 @@ void setup()  {
   delay(2000);
   FastLED.addLeds<WS2812B, WS2812BPIN, RGB>(leds, WS2812BCOUNT);
 
-  Serial.println("Woerdclock Start");
+  Serial.println("Woerdclock Start.");
 
   selftest(50); // test all LEDs
 
@@ -53,6 +53,7 @@ void setup()  {
   RTC.begin();
   if (RTC.isrunning()) {
     RTCpresent = true;
+    Serial.println("RTC present");
     DateTime now = RTC.now();
     h=now.hour();
     m=now.minute();
@@ -61,6 +62,11 @@ void setup()  {
   else{
     // following line sets the RTC to the date & time this sketch was compiled
     RTC.adjust(DateTime(__DATE__, __TIME__));
+    Serial.print("No RTC or RTC not running. Setting date to ");
+    Serial.print(__DATE__);
+    Serial.print(" and time to ");
+    Serial.print(__TIME__);
+    Serial.println(".");
   }
 } 
 
@@ -72,6 +78,7 @@ void loop()  {
     showTime(); // show current time
   }
 }
+
 
 
 

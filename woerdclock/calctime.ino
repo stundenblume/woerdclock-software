@@ -8,7 +8,7 @@ void calcTime(){
       if(h>=23) h=0;
       else{
         h++;
-        if (RTCpresent){
+        if (RTCpresent && TIMESCALE == 1){
           DateTime now = RTC.now();
           h=now.hour();
           m=now.minute();

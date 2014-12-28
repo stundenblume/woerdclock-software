@@ -1,20 +1,14 @@
 // this function will switch every LED short on and off
 
 void selftest(int pause){                                                      
-  // Move a single white led 
   for(int whiteLed = 0; whiteLed < WS2812BCOUNT; whiteLed = whiteLed + 1) {
-    // Turn our current led on to white, then show the leds
-    leds[whiteLed] = CRGB::White;
-
-    // Show the leds (only one of which is set to white, from above)
-    FastLED.show();
-
-    // Wait a little bit
-    delay(pause);
-
-    // Turn our current led back to black for the next loop around
-    leds[whiteLed] = CRGB::Black;
+    leds[whiteLed] = CRGB::White; // Turn our current led on to white, then show the leds
+    FastLED.show(); // Show the leds (only one of which is set to white, from above)
+    delay(pause); // Wait a little bit
+    leds[whiteLed] = CRGB::Black; // Turn our current led back to black for the next loop around
   }
 }
+
+
 
 

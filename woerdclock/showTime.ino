@@ -34,11 +34,11 @@ void showTime(){
   // show: es ist
   setItIs();
 
-  setM();
   setH();
-  setS();
+  setH();
+  setM();
 
-  if (m<5) setUhr();
+  if (m<5) setUhr(); // Just show for full hour "o'clock"
 
   FastLED.show();
   Serial.println();
@@ -147,13 +147,6 @@ void setM(){
     setTo();
   }
   for (int i=0;i<m%5 && m%5>0;i++) leds[i] = CRGB::White;
-}
-
-// Logic to switch seconds
-/////////////////////////////
-
-void setS(){
-
 }
 
 
