@@ -538,17 +538,26 @@ void segmentType(){
  * Global Variables: -
  * Output..........: -
  *
- * 0 ... .X. XXX XXX X.. XXX XXX XXX XXX XXX XXX
- * 1 ... .X. ..X ..X X.X X.. X.. ..X X.X X.X X.X
- * 2 .X. .X. XXX XXX XXX XXX XXX ..X XXX XXX X.X
- * 3 ... .X. X.. ..X ..X ..X X.X ..X X.X ..X X.X
- * 4 ... .X. XXX XXX ..X XXX XXX ..X XXX XXX XXX
+ * 0 ... XXX .X. XXX XXX X.. XXX XXX XXX XXX XXX
+ * 1 ... X.X .X. ..X ..X X.X X.. X.. ..X X.X X.X
+ * 2 .X. X.X .X. XXX XXX XXX XXX XXX ..X XXX XXX
+ * 3 ... X.X .X. X.. ..X ..X ..X X.X ..X X.X ..X
+ * 4 ... XXX .X. XXX XXX ..X XXX XXX ..X XXX XXX
+ *    *   0   1   2   3   4   5   6   7   8   9
  *
  ************************************************************/
 void show7segment(byte number, byte pos){
   if(pos==0 && number!=1) number=10; // on pos=0 just "1" can be displayed, because of to less space.
 
   switch (number){
+  case 0:
+    lightUp(0,0+pos*3,2+pos*3);
+    for (byte i=1;i<4;i++){
+      leds[koordinate(0+pos*3,i)] = CRGB::White;
+      leds[koordinate(2+pos*3,i)] = CRGB::White;
+    }
+    lightUp(4,0+pos*3,2+pos*3);
+    break;
   case 1:
     for (byte i=0;i<5;i++) leds[koordinate(0+pos*3,i)] = CRGB::White;
     break;
@@ -610,14 +619,6 @@ void show7segment(byte number, byte pos){
     leds[koordinate(2+pos*3,1)] = CRGB::White;
     lightUp(2,0+pos*3,2+pos*3);
     leds[koordinate(2+pos*3,3)] = CRGB::White;
-    lightUp(4,0+pos*3,2+pos*3);
-    break;
-  case 0:
-    lightUp(0,0+pos*3,2+pos*3);
-    for (byte i=1;i<4;i++){
-      leds[koordinate(0+pos*3,i)] = CRGB::White;
-      leds[koordinate(2+pos*3,i)] = CRGB::White;
-    }
     lightUp(4,0+pos*3,2+pos*3);
     break;
   default:

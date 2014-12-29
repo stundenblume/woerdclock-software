@@ -15,26 +15,30 @@
  *               2014-12-28 V0.2 - added different styles for displaying the time
  ********************************************/
 
+// include some libraries
+//////////////////////
 #include <Wire.h>
 #include "RTClib.h"
 #include "FastLED.h"
 
 
-RTC_DS1307 RTC;
+// global defines
+///////////////////////////
+#define TIMESCALE 1 // 1second / TIMESCALE, 1 for normal use 2 for two times faster...
 
-#define TIMESCALE 1 // 1 for normal clock mode
+#define WS2812BPIN 8 // where is the the data line of the LEDs connected
+#define WS2812BCOUNT 114 // how many LEDs are present
 
-#define WS2812BPIN 8
+boolean RTCpresent=false; // this variable will store if a RTC is present
 
-#define WS2812BCOUNT 114
+unsigned long lastSecond; // this Var will store when the last tick was made
 
-boolean RTCpresent=false;
+byte h=11, m=11, s=11; // this vars will store the current time
 
-unsigned long lastSecond;
-
-byte h=11, m=11, s=11;
-
-CRGB leds[WS2812BCOUNT];
+// init some libraries
+/////////////////////
+RTC_DS1307 RTC; // Realtimeclock
+CRGB leds[WS2812BCOUNT]; // WS2812B LEDs
 
 
 void setup()  {
@@ -48,35 +52,24 @@ void setup()  {
 
   selftest(50); // test all LEDs
 
-  Wire.begin();
+  Wire.begin(); // start I²C
+
+  // RTC
+  ////////////////////////////
   RTC.begin();
-  if (RTC.isrunning()) {
-    RTCpresent = true;
-    Serial.println("RTC present");
-    DateTime now = RTC.now();
-    h=now.hour();
-    m=now.minute();
-    s=now.second();     
-  }
-  else{
-    // following line sets the RTC to the date & time this sketch was compiled
-    RTC.adjust(DateTime(__DATE__, __TIME__));
-    Serial.print("No RTC or RTC not running. Setting date to ");
-    Serial.print(__DATE__);
-    Serial.print(" and time to ");
-    Serial.print(__TIME__);
-    Serial.println(".");
-  }
+  initRTC();
 } 
 
 void loop()  {
   // loop over and over again to show the current time
-  if (millis()-lastSecond >= 1000/TIMESCALE){ // just for test reasons every 10ms instead of 1s, so the time will be 10times faster
+  if (millis()-lastSecond >= 1000/TIMESCALE){
     lastSecond=millis();
     calcTime();
     showTime(0); // show current time
   }
 }
+
+
 
 
 
