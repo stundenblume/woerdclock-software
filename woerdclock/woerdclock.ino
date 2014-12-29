@@ -23,7 +23,7 @@
 
 RTC_DS1307 RTC;
 
-#define TIMESCALE 1 // 1 for normal clock mode
+#define TIMESCALE 100 // 1 for normal clock mode
 
 #define WS2812BPIN 8
 

@@ -199,7 +199,7 @@ void set2(){
   Serial.print(" two");
 }
 void set3(){
-  lightUp(2,0,3);
+  lightUp(6,0,3);
   Serial.print(" three");
 }
 void set4(){
