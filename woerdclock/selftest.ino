@@ -1,11 +1,18 @@
-// this function will switch every LED short on and off
-
+/************************************************************
+ * Functionname....: selftest(int pause)
+ * Description.....: This function will light up every LED once.
+ * Author..........: Sebastian Setz
+ * modified by.....: -
+ * Inpup...........: pause; this will define how fast the selftest will be
+ * Global Variables: -
+ * Output..........: -
+ ************************************************************/
 void selftest(int pause){                                                      
-  for(int whiteLed = 0; whiteLed < WS2812BCOUNT; whiteLed = whiteLed + 1) {
-    leds[whiteLed] = CRGB::White; // Turn our current led on to white, then show the leds
+  for(int i = 0; i < WS2812BCOUNT; i++) {
+    leds[i] = CRGB::White; // Turn our current led on to white, then show the leds
     FastLED.show(); // Show the leds (only one of which is set to white, from above)
     delay(pause); // Wait a little bit
-    leds[whiteLed] = CRGB::Black; // Turn our current led back to black for the next loop around
+    leds[i] = CRGB::Black; // Turn our current led back to black for the next loop around
   }
 }
 

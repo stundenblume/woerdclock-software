@@ -1,5 +1,12 @@
-//this function will calculate the current time
-
+/************************************************************
+ * Functionname....: calcTime()
+ * Description.....: This function will calc the current time and sync it every hour with the RTC. Expact if it is in fast forward mode.
+ * Author..........: Sebastian Setz
+ * modified by.....: -
+ * Inpup...........: -
+ * Global Variables: h, m, s
+ * Output..........: -
+ ************************************************************/
 void calcTime(){
   if (s>=59){
     s=0;

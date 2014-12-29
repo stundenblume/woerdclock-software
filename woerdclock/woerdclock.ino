@@ -1,19 +1,18 @@
 /*******************************************
- *
  * Name.......:  Wördclock
- * Description:  This is a small scetch wich will light up your Wördclock with minimal Hardware.
+ * Description:  This scetch wich will light up your Wördclock with minimal Hardware.
  * Author.....:  Sebastian Setz
- * Version....:  0.1
- * Date.......:  2014-12-26
+ * Version....:  0.2
+ * Date.......:  2014-12-28
  * Project....:  http://woerdclock.com http://wördclock.de
  * Contact....:  http://Sebastian.Setz.name
  * License....:  This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
  * Credit.....:  function "koordinate()", Jan S. (https://github.com/khold1996)
- * FastLED library, https://github.com/FastLED/FastLED
- * RTC library, adafruit https://github.com/adafruit/RTClib
+ *               FastLED library, https://github.com/FastLED/FastLED
+ *               RTC library, adafruit https://github.com/adafruit/RTClib
  * Keywords...:  arduino, time, clock, wordclock
  * History....:  2014-12-26 V0.1 - release
- *               
+ *               2014-12-28 V0.2 - added different styles for displaying the time
  ********************************************/
 
 #include <Wire.h>
@@ -75,7 +74,7 @@ void loop()  {
   if (millis()-lastSecond >= 1000/TIMESCALE){ // just for test reasons every 10ms instead of 1s, so the time will be 10times faster
     lastSecond=millis();
     calcTime();
-    showTime(); // show current time
+    showTime(0); // show current time
   }
 }
 
