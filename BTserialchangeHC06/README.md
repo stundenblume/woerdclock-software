@@ -13,14 +13,13 @@ How to connect:
 - Arduino (pin 3) with BT (RX)
 - Arduino (pin 7) with BT (KEY Pin)
 
-How to use it:
-At first, modify the sketch:
-1. set the actual baudrate of the bluetooth module, see manual of the module 
+How to use it: At first, modify the sketch:
+* set the actual baudrate of the bluetooth module, see manual of the module 
 - with mySerial.begin(9600);
-2. set the new name with 
+* set the new name with 
 - mySerial.print("AT+NAMEWC-HC06-BD9600");
 - where WC-HC06-BD9600 is the new name
-3. set the new baudrate with
+* set the new baudrate with
 - mySerial.print("AT+BAUD4");
 - where BAUD4 is for 9600baud
 
