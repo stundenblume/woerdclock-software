@@ -3,17 +3,17 @@
 * Author.....: Marcel Müller
 * Version....: 0.1
 * Date.......: 2014-12-31
-* License....: This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
+* License....: CC BY-NC-SA 4.0 
+		This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
 		To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 * Description: Change the properties of your bluetooth module hc-06 with an Arduino e.g. Arduino Yun
 - no serial monitor is required
+* Connection.:
 - Arduino (5V) with BT (Vcc)
 - Arduino (Gnc) with BT (Gnc)
 - Arduino (pin 2) with BT (TX)
 - Arduino (pin 3) with BT (RX)
 ********************************************/
-
-
 #include <SoftwareSerial.h>
 
 SoftwareSerial mySerial(2, 3);

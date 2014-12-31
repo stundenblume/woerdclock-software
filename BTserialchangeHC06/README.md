@@ -1,10 +1,15 @@
 BTserialchangeHC06
 ===================
 
-- is a part of wördclock, an Arduino powered and WS2812B featured Wordclock.
+- is a part of wördclock. An Arduino powered and WS2812B featured Wordclock.
 - This is a standalone sketch.
 - You can use it to modify your bluetooth module HC-06 with an Arduino.
 - No serial monitor is required.
+
+License: 
+- This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
+- CC BY-NC-SA 4.0 
+- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/.
 
 How to connect:
 - Arduino (5V) with BT (Vcc)
