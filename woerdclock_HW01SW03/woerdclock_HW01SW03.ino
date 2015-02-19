@@ -57,6 +57,7 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define RFM12 0        //Module RMF12B
 #define TEXT 0        //Show Massage Board 
 #define TEXT2 1        //Show Text
+#define RUNDECLOCK 0   //added 2 Minutes to time
 
 
 //Debug Mode or not (uncommand)
@@ -576,7 +577,7 @@ void setup() {
   #endif
   
   #if BLUETOOTH0
-  Serial1.begin(BAUDRATE);      // initialize serial port for bluetooth
+
   #endif
   
   #if BLUETOOTH1

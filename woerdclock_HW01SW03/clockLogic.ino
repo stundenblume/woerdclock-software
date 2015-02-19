@@ -23,6 +23,9 @@ void clockLogic() {
                         clockaktion = true;    //Clock in aktion
                         colorchange = false;  //color not change over serial
                         testMinutes = now.minute();
+                        #if  RUNDECLOCK
+                          testMintutes = testMinutes + 2;
+                        #endif
 		  	testHours = now.hour();
 			resetAndBlack();
 			timeToStrip(testHours, testMinutes);
@@ -37,6 +40,9 @@ void clockLogic() {
                         clockaktion = true;    //Clock in aktion
                         colorchange = false;  //color not change over serial 
                         testMinutes = minute();
+                        #if  RUNDECLOCK
+                          testMintutes = testMinutes + 2;
+                        #endif
 		  	testHours = hour();
 			resetAndBlack();
 			timeToStrip(testHours, testMinutes);
