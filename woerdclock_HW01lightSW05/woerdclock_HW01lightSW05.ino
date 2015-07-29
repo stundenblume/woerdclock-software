@@ -38,13 +38,16 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 */
 
 //Which Modules are installed?
+//This Setups are possible:
+//1. RTC, Button, LDR, DCF, DHT, TEXT2
+
 #define CONFIGBUTTON 0 //Config Buttons and adjust Time, SET CONFIGBUTTON or BUTTON 
 #define RTCLOCK 1     //Module Real Time Clock
 #define BUTTON 1      //Button are used  SET CONFIGBUTTON or BUTTON 
 #define LDR 1         //LDR is used
-#define GENSERIAL 1    //Gen Serial
-#define BLUETOOTH0 1   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
-#define USBPORT0 1     // Serial Communication across usb
+#define GENSERIAL 0    //Gen Serial
+#define BLUETOOTH0 0   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
+#define USBPORT0 0     // Serial Communication across usb
 #define BLUETOOTH1 0   //Module Bluetooth 1
 #define BLUETOOTH2 0   //Module Bluetooth 2
 #define WLAN 0         //Module WLAN
@@ -52,7 +55,7 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define DCFMODUL 0     //Module DCF77
 #define SDCARD 0       //Module SD Card
 #define MIC 0          //Module Microfon
-#define IRRESV 0         //Module IR
+#define IRRESV 0       //Module IR
 #define DHT11 1        //Module DHT11
 #define RFM12 0        //Module RMF12B
 #define TEXT 0        //Show Massage Board 
@@ -64,10 +67,19 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define DEBUG 1
 //****************************LED Config************************
 //Library includes
+#include <Time.h>
 #include <FastLED.h>
 #include <Wire.h>
 #include <avr/pgmspace.h>
 #include <EEPROM.h>
+
+
+//#if ARDUINO >= 100
+//#include <Arduino.h> 
+//#else
+//#include <WProgram.h> 
+//#endif
+
 //LED defines
 #define NUM_LEDS 114
 #define ANIMLEDS 100    //LED for Animation 
@@ -78,7 +90,7 @@ static byte heatanim[ANIMLEDS];
 long BAUDRATE = 57600; // default Baudrate for serial communication
  
 //PIN defines
-#define STRIP_DATA_PIN 8
+#define STRIP_DATA_PIN 5
 
 //LED varables
 uint8_t strip[NUM_LEDS];    //Array for the aktiv LEDs
@@ -89,6 +101,8 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
   byte ye=0, mo=0, da=0, h=4, m=4, s=4; //Variables to adjust the Clock 
   int testHours = 0;        //Variables change time? minute or hour?
   int testMinutes = 0;
+  
+  time_t time;
 //***************************RTC Config Library************************
 #if RTCLOCK
   #include "RTClib.h"    //Lib for RTC
@@ -101,7 +115,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 //****************************Button Config**********************
 #if CONFIGBUTTON
   
-  #define ANALOGPIN A6         //Analogpin for Button and LDR
+  #define ANALOGPIN A0         //Analogpin for Button and LDR
   //Button variables
   //#define CHARSHOWTIME 600     //
   #define AUTOENDTIME 5000       //Time for Funktion 
@@ -114,7 +128,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 
 //****************************Button ****************************
 #if BUTTON 
-  #define ANALOGPIN A6              //Analogpin for Button and LDR
+  #define ANALOGPIN A0              //Analogpin for Button and LDR
   //Button variables
   #define AUTOENDTIME 5000          //Time for Funktion
   #define TOLLERANCE 10             //Tollerance for the ButtonsValue
@@ -123,7 +137,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 #endif
 //****************************LDR Config************************
 #if LDR
-  #define ANALOGPIN A6              //Analogpin for Button and LDR
+  #define ANALOGPIN A1              //Analogpin for Button and LDR
   long waitUntilLDR = 0;            // for LDR
 #endif
 //****************************Serial Config******************
@@ -238,14 +252,75 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 #endif
 //****************************DCF Config************************
 #if DCFMODUL
-#include "DCF77.h"
-#include "Time.h"
+
+ 
   
-  #define DCF_PIN 7	         // Connection pin to DCF 77 device
-  #define DCF_INTERRUPT 4	 // Interrupt number associated with pin
+  #define DCF_PIN 7	          // Connection pin to DCF 77 device
   
-  time_t time;
-  DCF77 DCF = DCF77(DCF_PIN,DCF_INTERRUPT);
+  #define MIN_TIME 1334102400     // Date: 11-4-2012
+  #define MAX_TIME 4102444800     // Date:  1-1-2100
+  
+  #define DCFRejectionTime 700	  // Pulse-to-Pulse rejection time. 
+  #define DCFRejectPulseWidth 50  // Minimal pulse width
+  #define DCFSplitTime 180	  // Specifications distinguishes pulse width 100 ms and 200 ms. In practice we see 130 ms and 230
+  #define DCFSyncTime 1500	  // Specifications defines 2000 ms pulse for end of sequence
+  
+  bool initialized;
+  static byte pulseStart=HIGH;
+  
+  
+  // DCF77 and internal timestamps
+  static time_t previousUpdatedTime;
+  static time_t latestupdatedTime;           	
+  static time_t processingTimestamp;
+  static time_t previousProcessingTimestamp;		
+  static unsigned char CEST;
+  
+  // DCF time format structure
+	struct DCF77Buffer {
+	  //unsigned long long prefix		:21;
+	  unsigned long long prefix		:17;
+	  unsigned long long CEST		:1; // CEST 
+	  unsigned long long CET		:1; // CET 
+	  unsigned long long unused		:2; // unused bits
+	  unsigned long long Min		:7;	// minutes
+	  unsigned long long P1			:1;	// parity minutes
+	  unsigned long long Hour		:6;	// hours
+	  unsigned long long P2			:1;	// parity hours
+	  unsigned long long Day		:6;	// day
+	  unsigned long long Weekday	:3;	// day of week
+	  unsigned long long Month		:5;	// month
+	  unsigned long long Year		:8;	// year (5 -> 2005)
+	  unsigned long long P3			:1;	// parity
+	};
+  
+  // DCF Parity format structure
+	struct ParityFlags{
+		unsigned char parityFlag	:1;
+		unsigned char parityMin		:1;
+		unsigned char parityHour	:1;
+		unsigned char parityDate	:1;
+	} static flags;
+
+// Parameters shared between interupt loop and main loop
+        static volatile int test;
+	static volatile bool FilledBufferAvailable;
+	static volatile unsigned long long filledBuffer;
+	static volatile time_t filledTimestamp;
+
+	// DCF Buffers and indicators
+	static int  bufferPosition;
+	static unsigned long long runningBuffer;
+	static unsigned long long processingBuffer;
+
+	// Pulse flanks
+	static   int leadingEdge;
+	static   int trailingEdge;
+	static   int PreviousLeadingEdge;
+	static   bool Up;
+  
+  
+
 #endif
 //****************************SD Config*************************
 #if SDCARD
@@ -558,7 +633,9 @@ void setup() {
 
 //***************setup DCF*****************************
     #if DCFMODUL
-	DCF.Start();
+        pinMode(DCF_PIN, INPUT);
+        initializeDCF();
+        StartDCF();
     #endif
 //***************setup ir******************************
 //    #if IRRESV	
@@ -643,7 +720,7 @@ void loop() {
     
     #if DCFMODUL
 
-    time_t DCFtime = DCF.getTime(); // Check if new DCF77 time is available and adjust the RTC
+    time_t DCFtime = getTime(); // Check if new DCF77 time is available and adjust the RTC
         if (DCFtime!=0)
           {
               DEBUG_PRINT(F("Time is updated"));

@@ -91,11 +91,8 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
   int testMinutes = 0;
 //***************************RTC Config Library************************
 #if RTCLOCK
-  #include "RTClib.h"    //Lib for RTC
-  RTC_DS1307 RTC;        //TYP of RTC
- //RTC variables
-  boolean RTCpresent=false;
-  //unsigned long lastSecond;
+  #include <Time.h>    //Lib for RTC 
+  time_t t = 0;
 #endif
 
 //****************************Button Config**********************
@@ -441,7 +438,7 @@ B00001111
 #endif
 //****************************RFM12 Config**********************
 #if RFM12
-  #include <RF12.h>
+  #include <RF12_T3.h>
   //#include <util/crc16.h>
   //#include <util/parity.h>
   #include <avr/eeprom.h>
@@ -500,24 +497,32 @@ void setup() {
 
 //***************Setup RTC***************************
     #if RTCLOCK        
-        DateTime now = RTC.now();
-        Wire.begin();
-        RTC.begin();
-        if (RTC.isrunning()) {
-          //RTCpresent = true;
-          DateTime now = RTC.now();
-          ye=now.year();
-          mo=now.month();
-          da=now.day();
-          h=now.hour();
-          m=now.minute();
-          s=now.second();     
+        // set the Time library to use Teensy 3.0's RTC to keep time
+        setSyncProvider(getTeensy3Time);
+        
+        if (timeStatus()!= timeSet) {
+        Serial.println("Unable to sync with the RTC");
+        } else {
+        Serial.println("RTC has set the system time");
         }
-        else{
-        // following line sets the RTC to the date & time this sketch was compiled
-        RTC.adjust(DateTime(__DATE__, __TIME__));
-        DEBUG_PRINT("No RTC");
-        }	
+//        DateTime now = RTC.now();
+//        Wire.begin();
+//        RTC.begin();
+//        if (RTC.isrunning()) {
+//          //RTCpresent = true;
+//          DateTime now = RTC.now();
+//          ye=now.year();
+//          mo=now.month();
+//          da=now.day();
+//          h=now.hour();
+//          m=now.minute();
+//          s=now.second();     
+//        }
+//        else{
+//        // following line sets the RTC to the date & time this sketch was compiled
+//        RTC.adjust(DateTime(__DATE__, __TIME__));
+//        DEBUG_PRINT("No RTC");
+//        }	
     #endif
 //***************Setup BUTTON CONFIG***************************
      #if CONFIGBUTTON
@@ -617,6 +622,19 @@ void loop() {
 //        doIRLogic();
 //    #endif
 
+    #if RTCLOCK
+
+      if (Serial.available()) {
+        t = processSyncMessage();
+        if (t != 0) {
+          Teensy3Clock.set(t); // set the RTC
+          setTime(t);
+        }
+      }
+      digitalClockDisplay();
+
+    #endif
+
     #if LDR	
         doLDRLogic();
     #endif
@@ -634,7 +652,8 @@ void loop() {
       timestampold = timestamp;
       DEBUG_PRINT(F("Time is "));
       DEBUG_PRINT(timestamp);
-      RTC.adjust(DateTime(timestamp)); 
+      Teensy3Clock.set(t); // set the RTC
+      setTime(t); 
       }
       #endif
     #endif
