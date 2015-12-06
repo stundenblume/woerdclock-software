@@ -24,7 +24,7 @@ void clockLogic() {
                         colorchange = false;  //color not change over serial
                         testMinutes = now.minute();
                         #if  RUNDECLOCK
-                          testMintutes = testMinutes + 2;
+                          testMinutes = testMinutes + 2;
                         #endif
 		  	testHours = now.hour();
 			resetAndBlack();
@@ -41,7 +41,7 @@ void clockLogic() {
                         colorchange = false;  //color not change over serial 
                         testMinutes = minute();
                         #if  RUNDECLOCK
-                          testMintutes = testMinutes + 2;
+                          testMinutes = testMinutes + 2;
                         #endif
 		  	testHours = hour();
 			resetAndBlack();
@@ -61,6 +61,7 @@ void clockLogiColor() {
 		waitUntilClock = millis();
 		DateTime now = RTC.now();
                 clockaktion = true;    //Clock in aktion
+                
                 #if DEBUG
                         Serial.print(now.year(), DEC);
                         Serial.print('/');
@@ -75,6 +76,7 @@ void clockLogiColor() {
                         Serial.print(now.second(), DEC);
                         Serial.println();
                 #endif
+                
                 if(testMinutes != now.minute() || testHours != now.hour() || dhtaktion) {
 			dhtaktion = false;    //dht not in aktion 
                         testMinutes = now.minute();

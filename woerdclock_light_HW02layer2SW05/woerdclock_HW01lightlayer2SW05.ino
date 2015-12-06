@@ -1,4 +1,4 @@
-/* 
+  /* 
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,37 +38,49 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 */
 
 //Which Modules are installed?
+//This Setups are possible:
+//1. RTC, Button, LDR, DCF, DHT, TEXT2
+
 #define CONFIGBUTTON 0 //Config Buttons and adjust Time, SET CONFIGBUTTON or BUTTON 
-#define RTCLOCK 1      //Module Real Time Clock
-#define BUTTON 1       //Button are used  SET CONFIGBUTTON or BUTTON 
-#define LDR 1          //LDR is used
-#define GENSERIAL 1    //Gen Serial
-#define BLUETOOTH0 0  //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
-#define USBPORT0 1     //Serial Communication across usb
-#define BLUETOOTH1 1   //Module Bluetooth 1
+#define RTCLOCK 1     //Module Real Time Clock
+#define BUTTON 1      //Button are used  SET CONFIGBUTTON or BUTTON 
+#define LDR 1         //LDR is used
+#define GENSERIAL 0    //Gen Serial
+#define BLUETOOTH0 0   //Module Bluetooth, via pin 0,1 - default=0, because on this port is the led stripe connected
+#define USBPORT0 0     // Serial Communication across usb
+#define BLUETOOTH1 0   //Module Bluetooth 1
 #define BLUETOOTH2 0   //Module Bluetooth 2
 #define WLAN 0         //Module WLAN
 #define DOF 0          //Module 10DOF
-#define DCFMODUL 0     //Module DCF77
+#define DCFMODUL 1     //Module DCF77
 #define SDCARD 0       //Module SD Card
 #define MIC 0          //Module Microfon
 #define IRRESV 0       //Module IR
 #define DHT11 1        //Module DHT11
 #define RFM12 0        //Module RMF12B
-#define TEXT 0         //Show scrolling Massage Board 
-#define TEXT2 1        //Show small Text
+#define TEXT 0        //Show Massage Board 
+#define TEXT2 1        //Show Text
 #define RUNDECLOCK 0   //added 2 Minutes to time
-#define ANIMATION 0    //Module Anmimation
+#define SETTIME 1     //Set Time manuel (siehe setup)
 
 
 //Debug Mode or not (uncommand)
 #define DEBUG 1
 //****************************LED Config************************
 //Library includes
+#include <Time.h>
 #include <FastLED.h>
 #include <Wire.h>
 #include <avr/pgmspace.h>
 #include <EEPROM.h>
+
+
+//#if ARDUINO >= 100
+//#include <Arduino.h> 
+//#else
+//#include <WProgram.h> 
+//#endif
+
 //LED defines
 #define NUM_LEDS 114
 #define ANIMLEDS 100    //LED for Animation 
@@ -90,6 +102,8 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
   byte ye=0, mo=0, da=0, h=4, m=4, s=4; //Variables to adjust the Clock 
   int testHours = 0;        //Variables change time? minute or hour?
   int testMinutes = 0;
+  
+  time_t time;
 //***************************RTC Config Library************************
 #if RTCLOCK
   #include "RTClib.h"    //Lib for RTC
@@ -102,7 +116,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 //****************************Button Config**********************
 #if CONFIGBUTTON
   
-  #define ANALOGPIN A6         //Analogpin for Button and LDR
+  #define ANALOGPIN A0         //Analogpin for Button and LDR
   //Button variables
   //#define CHARSHOWTIME 600     //
   #define AUTOENDTIME 5000       //Time for Funktion 
@@ -216,7 +230,7 @@ char       cmd[paraCount][paraLength];               //arry with command and par
     "\n\r smode          set the mode";
     "\n\r gmode          get the mode\n";
     */
-    const char strerror[] = "error";
+    const char strerror2[] = "error";
     const char paramseperator = ',';
     const char cmdbreak = '\n';
   #endif
@@ -227,7 +241,7 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 #endif
 //****************************Bluetooth2 Config******************
 #if BLUETOOTH2
-  SoftwareSerial BTSerial2(10, 11); // Connect Arduino Micro pin 20 with HC-06 pin RX and Arduino Micro pin 21 with HC-06 pin TX
+  //SoftwareSerial BTSerial2(10, 11); // Connect Arduino Micro pin 20 with HC-06 pin RX and Arduino Micro pin 21 with HC-06 pin TX
 #endif
 //****************************WLAN Config************************
 #if WLAN
@@ -239,14 +253,75 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 #endif
 //****************************DCF Config************************
 #if DCFMODUL
-#include "DCF77.h"
-#include "Time.h"
+
+ 
   
-  #define DCF_PIN 7	         // Connection pin to DCF 77 device
-  #define DCF_INTERRUPT 4	 // Interrupt number associated with pin
+  #define DCF_PIN 7	          // Connection pin to DCF 77 device
   
-  time_t time;
-  DCF77 DCF = DCF77(DCF_PIN,DCF_INTERRUPT);
+  #define MIN_TIME 1334102400     // Date: 11-4-2012
+  #define MAX_TIME 4102444800     // Date:  1-1-2100
+  
+  #define DCFRejectionTime 700	  // Pulse-to-Pulse rejection time. 
+  #define DCFRejectPulseWidth 50  // Minimal pulse width
+  #define DCFSplitTime 180	  // Specifications distinguishes pulse width 100 ms and 200 ms. In practice we see 130 ms and 230
+  #define DCFSyncTime 1500	  // Specifications defines 2000 ms pulse for end of sequence
+  
+  bool initialized;
+  static byte pulseStart=HIGH;
+  
+  
+  // DCF77 and internal timestamps
+  static time_t previousUpdatedTime;
+  static time_t latestupdatedTime;           	
+  static time_t processingTimestamp;
+  static time_t previousProcessingTimestamp;		
+  static unsigned char CEST;
+  
+  // DCF time format structure
+	struct DCF77Buffer {
+	  //unsigned long long prefix		:21;
+	  unsigned long long prefix		:17;
+	  unsigned long long CEST		:1; // CEST 
+	  unsigned long long CET		:1; // CET 
+	  unsigned long long unused		:2; // unused bits
+	  unsigned long long Min		:7;	// minutes
+	  unsigned long long P1			:1;	// parity minutes
+	  unsigned long long Hour		:6;	// hours
+	  unsigned long long P2			:1;	// parity hours
+	  unsigned long long Day		:6;	// day
+	  unsigned long long Weekday	:3;	// day of week
+	  unsigned long long Month		:5;	// month
+	  unsigned long long Year		:8;	// year (5 -> 2005)
+	  unsigned long long P3			:1;	// parity
+	};
+  
+  // DCF Parity format structure
+	struct ParityFlags{
+		unsigned char parityFlag	:1;
+		unsigned char parityMin		:1;
+		unsigned char parityHour	:1;
+		unsigned char parityDate	:1;
+	} static flags;
+
+// Parameters shared between interupt loop and main loop
+        static volatile int test;
+	static volatile bool FilledBufferAvailable;
+	static volatile unsigned long long filledBuffer;
+	static volatile time_t filledTimestamp;
+
+	// DCF Buffers and indicators
+	static int  bufferPosition;
+	static unsigned long long runningBuffer;
+	static unsigned long long processingBuffer;
+
+	// Pulse flanks
+	static   int leadingEdge;
+	static   int trailingEdge;
+	static   int PreviousLeadingEdge;
+	static   bool Up;
+  
+  
+
 #endif
 //****************************SD Config*************************
 #if SDCARD
@@ -322,7 +397,6 @@ long waitUntilDHT = 0;
 const long dhtDelay = 30000;     //delay for show temp and humidity  
 #endif
 
-//******************************Text******************************
 #if TEXT
 
   //arrays for the char  
@@ -365,9 +439,7 @@ const boolean array8 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,
 const boolean array9 [6][10] =  {{0,0,1,1,0,0,1,0,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,1,0,0,1,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};            
 const boolean array0 [6][10] =  {{0,0,1,1,1,1,1,0,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,1,0,0,0,0,0,1,0,0},{0,0,1,1,1,1,1,0,0,0},{0,0,0,0,0,0,0,0,0,0}};
 #endif
-
-//*****************************Text2*********************************
-
+//**************************************************************
 #if TEXT2
 byte startrow = 0;
 
@@ -443,8 +515,7 @@ B00001111
 };
 
 #endif
-
-//****************************RFM12 Config***************************
+//****************************RFM12 Config**********************
 #if RFM12
   #include <RF12.h>
   //#include <util/crc16.h>
@@ -452,10 +523,9 @@ B00001111
   #include <avr/eeprom.h>
 #endif
 
-//****************************Default Config**************************
-
+//****************************Default Config********************
 //Display Mode at start
-int displayMode = 4;        //Clock with Color Change is default Modus
+int displayMode = 2;        //Clock with Color Change is default Modus
 //Default Color?
 CRGB defaultColor = CRGB::Blue; //White, Red, Green, Blue, Yellow
 byte LEDbright = EEPROM.read(4); // this is a dummy variable for the LED brightness
@@ -479,13 +549,11 @@ boolean colorchange = false;     //Color Change over Serial
 boolean clockaktion = true;    //Clock in aktion marker
 
 //****************************Debug Config**********************
-
 #if DEBUG
 	#define DEBUG_PRINT(str)  Serial.println (str)
 #else
 	#define DEBUG_PRINT(str)
 #endif
-
 //****************************Setup*************************************************************************************************************
 //##############################################################################################################################################
 //**********************************************************************************************************************************************
@@ -508,12 +576,21 @@ void setup() {
 
 //***************Setup RTC***************************
     #if RTCLOCK        
-        RTC.adjust(DateTime(__DATE__, __TIME__));
+        RTC.adjust(DateTime(__DATE__, __TIME__));  //sets the RTC to the date & time this sketch was compiled
         DateTime now = RTC.now();
+        DEBUG_PRINT("No RTC");
         Wire.begin();
         RTC.begin();
         if (RTC.isrunning()) {
           //RTCpresent = true;
+        #if SETTIME  
+          ye = 2015;
+          mo = 12;
+          da = 6;
+          h = 13;
+          m = 12;
+          RTC.adjust(DateTime(ye, mo, da, h, m, 0));
+        #endif
           DateTime now = RTC.now();
           ye=now.year();
           mo=now.month();
@@ -528,9 +605,7 @@ void setup() {
         DEBUG_PRINT("No RTC");
         }	
     #endif
-    
 //***************Setup BUTTON CONFIG***************************
-
      #if CONFIGBUTTON
         if(analogRead(ANALOGPIN)<10) menue = true;        //Menue start with Jumper
       
@@ -569,7 +644,9 @@ void setup() {
 
 //***************setup DCF*****************************
     #if DCFMODUL
-	DCF.Start();
+        pinMode(DCF_PIN, INPUT);
+        initializeDCF();
+        StartDCF();
     #endif
 //***************setup ir******************************
 //    #if IRRESV	
@@ -654,7 +731,7 @@ void loop() {
     
     #if DCFMODUL
 
-    time_t DCFtime = DCF.getTime(); // Check if new DCF77 time is available and adjust the RTC
+    time_t DCFtime = getTime(); // Check if new DCF77 time is available and adjust the RTC
         if (DCFtime!=0)
           {
               DEBUG_PRINT(F("Time is updated"));
@@ -671,9 +748,7 @@ void loop() {
 			off();
 			break;
 		case 1:                  //Fire Animation in a 10x10 Matrix
-			#if ANIMATION
-                        animation();
-                        #endif           
+			animation();           
 			break;
 		case 2:                  //Disco or ColorClockmod
                         #if MIC
