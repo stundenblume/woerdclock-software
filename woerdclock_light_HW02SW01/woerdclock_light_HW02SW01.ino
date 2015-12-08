@@ -105,7 +105,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 //****************************Button Config**********************
 #if CONFIGBUTTON
   
-  #define ANALOGPIN A6         //Analogpin for Button and LDR
+  #define ANALOGPIN A6         //Analogpin for Button
   //Button variables
   //#define CHARSHOWTIME 600     //
   #define AUTOENDTIME 5000       //Time for Funktion 
@@ -118,7 +118,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 
 //****************************Button ****************************
 #if BUTTON 
-  #define ANALOGPIN A0              //Analogpin for Button and LDR
+  #define ANALOGPIN A0              //Analogpin for Button
   //Button variables
   #define AUTOENDTIME 5000          //Time for Funktion
   #define TOLLERANCE 10             //Tollerance for the ButtonsValue
@@ -127,7 +127,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 #endif
 //****************************LDR Config************************
 #if LDR
-  #define ANALOGPIN A1              //Analogpin for Button and LDR
+  #define ANALOGPINLDR A1              //Analogpin for LDR
   long waitUntilLDR = 0;            // for LDR
 #endif
 //****************************Serial Config******************

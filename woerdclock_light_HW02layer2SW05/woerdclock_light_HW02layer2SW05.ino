@@ -63,6 +63,12 @@ no jumper is set; push the ok button; with the h- and m-button chance the mod th
 #define RUNDECLOCK 0   //added 2 Minutes to time
 #define SETTIME 1     //Set Time manuel (siehe setup)
 
+//Settime Einstellungen die einmal mit SETTIME 1 und dann mit 0 hochgeladen werden um die Zeit einzustellen
+          ye = 2015;
+          mo = 12;
+          da = 6;
+          h = 13;
+          m = 12;
 
 //Debug Mode or not (uncommand)
 #define DEBUG 1
@@ -116,7 +122,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 //****************************Button Config**********************
 #if CONFIGBUTTON
   
-  #define ANALOGPIN A0         //Analogpin for Button and LDR
+  #define ANALOGPIN A0         //Analogpin for Button
   //Button variables
   //#define CHARSHOWTIME 600     //
   #define AUTOENDTIME 5000       //Time for Funktion 
@@ -129,7 +135,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 
 //****************************Button ****************************
 #if BUTTON 
-  #define ANALOGPIN A0              //Analogpin for Button and LDR
+  #define ANALOGPIN A0              //Analogpin for Button
   //Button variables
   #define AUTOENDTIME 5000          //Time for Funktion
   #define TOLLERANCE 10             //Tollerance for the ButtonsValue
@@ -138,7 +144,7 @@ CRGB leds[NUM_LEDS];        //LED Array for FASTLED
 #endif
 //****************************LDR Config************************
 #if LDR
-  #define ANALOGPIN A1              //Analogpin for Button and LDR
+  #define ANALOGPINLDR A1              //Analogpin for LDR
   long waitUntilLDR = 0;            // for LDR
 #endif
 //****************************Serial Config******************
@@ -253,8 +259,6 @@ char       cmd[paraCount][paraLength];               //arry with command and par
 #endif
 //****************************DCF Config************************
 #if DCFMODUL
-
- 
   
   #define DCF_PIN 7	          // Connection pin to DCF 77 device
   
@@ -584,11 +588,6 @@ void setup() {
         if (RTC.isrunning()) {
           //RTCpresent = true;
         #if SETTIME  
-          ye = 2015;
-          mo = 12;
-          da = 6;
-          h = 13;
-          m = 12;
           RTC.adjust(DateTime(ye, mo, da, h, m, 0));
         #endif
           DateTime now = RTC.now();
